@@ -1,0 +1,17 @@
+html, body, div, ul, li, dl, dt, dd, form ,img{margin:0;border:0;padding:0;list-style:none;}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, select, textarea, p, blockquote, th, td
+{
+	margin: 0;
+	padding: 0;
+	font-family: '微軟正黑體', Arial, sans-serif;
+	color: #000;
+	font-size: 13px;
+	-webkit-text-size-adjust: none; /*解決Chrome 12px以下字級*/
+	}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+.test {
+	color: yellow;
+}
