@@ -19,7 +19,6 @@ import idv.mint.entity.enums.StockMarketType;
 
 public class StockCreator {
     
-    
     public static List<StockCategory> createStockCategoryList(List<String> lines) {
 
  	List<StockCategory> list = new ArrayList<>();
