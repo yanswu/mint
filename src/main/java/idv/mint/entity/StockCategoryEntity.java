@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -33,6 +34,7 @@ public class StockCategoryEntity implements Serializable {
     private Integer orderNo;
 
     @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "STOCK_CATEGORY_ID")
     private List<StockEntity> stockList;
 
     public StockCategoryEntity() {

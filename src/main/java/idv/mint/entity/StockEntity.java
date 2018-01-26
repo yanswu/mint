@@ -35,7 +35,7 @@ public class StockEntity implements Serializable {
     @Column(name = "OVERSEAS_TYPE",nullable=false)
     private Integer overseasType;
 
-    @JoinColumn(name = "STOCK_CATEGORY_ID")
+    @Column(name = "STOCK_CATEGORY_ID")
     private Integer stockCategoryId;
 
     public StockEntity() {
