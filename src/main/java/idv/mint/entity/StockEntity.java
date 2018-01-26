@@ -47,10 +47,15 @@ public class StockEntity implements Serializable {
 	this.overseasType = overseasType.getValue();
 	this.stockCategoryId = stockCategoryId;
     }
-
+    
+    public String getStockCode() {
+	return stockId;
+    }
+    
     public String getStockId() {
 	return stockId;
     }
+    
 
     public void setStockId(String stockId) {
 	this.stockId = stockId;

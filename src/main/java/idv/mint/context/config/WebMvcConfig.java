@@ -12,7 +12,7 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = { "idv.mint.web","idv.mint.service","idv.mint.dao" })
+@ComponentScan(basePackages = { "idv.mint.web" })
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override

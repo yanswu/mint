@@ -12,25 +12,26 @@ import org.apache.commons.lang3.StringUtils;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
 import idv.mint.util.crawl.Crawler;
+import idv.mint.util.stock.StockCreator;
 
 public class FileCrawler implements Crawler {
 
     @Override
     public List<String> getStockCategory(StockMarketType marketType) throws IOException {
-	
+
 	Path path = null;
-	
-	if(marketType == null || marketType.isUnknown()) {
+
+	if (marketType == null || marketType.isUnknown()) {
 	    return new ArrayList<>();
 	}
-	
-	if(marketType.isTSE()) {
+
+	if (marketType.isTSE()) {
 	    path = PathSettings.STOCK_CATEGORY_TSE_CSV.getPath();
-	}else if(marketType.isOTC()) {
-	    path = PathSettings.STOCK_CATEGORY_OTC_CSV.getPath();	    
+	} else if (marketType.isOTC()) {
+	    path = PathSettings.STOCK_CATEGORY_OTC_CSV.getPath();
 	}
-	
-	if(path != null) {
+
+	if (path != null) {
 	    return Files.readAllLines(path);
 	}
 	return new ArrayList<>();
@@ -86,25 +87,42 @@ public class FileCrawler implements Crawler {
 
     @Override
     public List<String> getStock(StockMarketType marketType, String categoryName) throws IOException {
-	// TODO Auto-generated method stub
-	return null;
+
+	if (marketType == null || marketType.isUnknown()) {
+	    return new ArrayList<>();
+	}
+
+	Path path = null;
+
+	if (marketType.isTSE()) {
+	    path = PathSettings.STOCK_TSE_CSV.getPath();
+	} else if (marketType.isOTC()) {
+	    path = PathSettings.STOCK_OTC_CSV.getPath();
+	}
+
+	List<String> lines = Files.readAllLines(path);
+	return lines.stream().filter(line ->{
+	    String[] sections = StringUtils.split(line,",");
+	    return StringUtils.equals(categoryName, sections[2]);
+	}).collect(Collectors.toList());
+	
     }
 
     private StockMarketType getStockMarketType(String stockCode) throws IOException {
 
-	boolean isContainStockCodePath = isContainStockCodePath(PathSettings.STOCK_TSE_CSV.getPath(), stockCode);
+	boolean isContainStockCodePath = isPathContainStockCode(PathSettings.STOCK_TSE_CSV.getPath(), stockCode);
 
 	if (isContainStockCodePath) {
 	    return StockMarketType.TSE;
 	} else {
-	    isContainStockCodePath = isContainStockCodePath(PathSettings.STOCK_OTC_CSV.getPath(), stockCode);
+	    isContainStockCodePath = isPathContainStockCode(PathSettings.STOCK_OTC_CSV.getPath(), stockCode);
 
 	    return isContainStockCodePath ? StockMarketType.OTC : StockMarketType.UNKNOWN;
 	}
 
     }
 
-    private boolean isContainStockCodePath(Path readPath, String stockCode) throws IOException {
+    private boolean isPathContainStockCode(Path readPath, String stockCode) throws IOException {
 
 	List<String> lines = Files.readAllLines(readPath);
 	long counts = lines.stream().filter(line -> {

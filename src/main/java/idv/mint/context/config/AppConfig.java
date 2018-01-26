@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 @Configuration
-@ComponentScan(basePackages = {"idv.mint.service"})
+@ComponentScan(basePackages = {"idv.mint.service","idv.mint.dao"})
 public class AppConfig {
     
     @Bean

@@ -23,6 +23,9 @@ public interface Crawler {
     }
     
     /**
+     * <pre>
+     * 	 pattern :marketType(1,2), sequence, categoryName
+     * </pre>
      * 取得上櫃或上市的分類名稱
      * @param marketType
      * @return

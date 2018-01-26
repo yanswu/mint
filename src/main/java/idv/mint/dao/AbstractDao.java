@@ -2,9 +2,13 @@ package idv.mint.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+
+import org.hibernate.Criteria;
 
 public abstract class AbstractDao<PK extends Serializable, T> {
 
@@ -22,19 +26,27 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 	return this.entityManager;
     }
 
-    protected T getByKey(PK key) {
+    public T getByKey(PK key) {
 	return (T) entityManager.find(entityClass, key);
     }
 
-    protected void persist(T entity) {
+    public void persistList(List<T> entityList) {
+	entityList.forEach(entity->{
+	    persist(entity);
+	});
+    }
+    
+    public void persist(T entity) {
 	entityManager.persist(entity);
     }
 
-    protected void update(T entity) {
+    public void update(T entity) {
 	entityManager.merge(entity);
     }
 
-    protected void delete(T entity) {
+    public void delete(T entity) {
 	entityManager.remove(entity);
     }
+    
+    
 }

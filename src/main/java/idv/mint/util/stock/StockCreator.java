@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.util.CollectionUtils;
 
 import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
@@ -23,7 +23,7 @@ public class StockCreator {
 
  	List<StockCategory> list = new ArrayList<>();
 
- 	if (!CollectionUtils.isEmpty(lines)) {
+ 	if (CollectionUtils.isNotEmpty(lines)) {
 
  	    list = lines.stream().map(line -> {
  		String[] sections = StringUtils.split(line, ",");
@@ -38,7 +38,7 @@ public class StockCreator {
 	
 	List<Stock> list = new ArrayList<>();
 	
-	if (!CollectionUtils.isEmpty(lines)) {
+	if (CollectionUtils.isNotEmpty(lines)) {
 	    
 	    list = lines.stream().map(line -> {
 		String[] sections = StringUtils.split(line, ",");
@@ -58,7 +58,7 @@ public class StockCreator {
 
  	List<StockSheet> list = new ArrayList<>();
 
- 	if (!CollectionUtils.isEmpty(epsLines)) {
+ 	if (CollectionUtils.isNotEmpty(epsLines)) {
 
  	    for (String line : epsLines) {
  		String[] sections = StringUtils.split(line, ",");
@@ -95,7 +95,7 @@ public class StockCreator {
  	    Map<Integer, StockSheet> map = list.stream().collect(Collectors.toMap(c -> c.getBaseDate().getYear(), Function.identity()));
 
  	    // stock dividend
- 	    if (!CollectionUtils.isEmpty(dividendLines)) {
+ 	    if (CollectionUtils.isNotEmpty(dividendLines)) {
 
  		dividendLines.forEach(line -> {
  		    String[] sections = StringUtils.split(line, ",");
