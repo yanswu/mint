@@ -8,9 +8,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.springframework.util.CollectionUtils;
 
 import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
@@ -102,7 +102,7 @@ public class StockCsvWriterBatch {
 	categoryLines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
 	
 
-	if (!CollectionUtils.isEmpty(categoryLines)) {
+	if (!CollectionUtils.isNotEmpty(categoryLines)) {
 
 	    Crawler crawler = Crawler.createWebCrawler();
 	    
@@ -120,7 +120,7 @@ public class StockCsvWriterBatch {
 		    StringBuilder sb = new StringBuilder();
 		    sb.append(stockCategory.getMarketType().getValue());
 		    sb.append(",");
-		    sb.append(stockCategory.getSequence());
+		    sb.append(stockCategory.getOrderNo());
 		    sb.append(",");
 		    sb.append(stockCategory.getName());
 		    sb.append(",");
@@ -159,7 +159,7 @@ public class StockCsvWriterBatch {
 	lines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
 	FileUtils.cleanFile(writePath);
 
-	if (!CollectionUtils.isEmpty(lines)) {
+	if (!CollectionUtils.isNotEmpty(lines)) {
 	    Crawler crawler = Crawler.createWebCrawler();
 	    List<Stock> stockList = StockCreator.createStockList(lines);
 	    for (Stock stock : stockList) {
