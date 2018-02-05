@@ -6,19 +6,29 @@ import idv.mint.entity.enums.StockMarketType;
 
 public class StockCategory {
 
+    private String stockCategoryId;
+
     private StockMarketType marketType;
 
-    private Integer sequence;
+    private Integer orderNo;
 
     private String name;
 
     public StockCategory() {
     }
 
-    public StockCategory(StockMarketType marketType, Integer sequence,String name) {
+    public StockCategory(StockMarketType marketType, Integer orderNo, String name) {
 	this.marketType = marketType;
-	this.sequence = sequence;
+	this.orderNo = orderNo;
 	this.name = name;
+    }
+
+    public String getStockCategoryId() {
+	return stockCategoryId;
+    }
+
+    public void setStockCategoryId(String stockCategoryId) {
+	this.stockCategoryId = stockCategoryId;
     }
 
     public StockMarketType getMarketType() {
@@ -29,12 +39,12 @@ public class StockCategory {
 	this.marketType = marketType;
     }
 
-    public Integer getSequence() {
-	return sequence;
+    public Integer getOrderNo() {
+	return orderNo;
     }
 
-    public void setSequence(Integer sequence) {
-	this.sequence = sequence;
+    public void setOrderNo(Integer orderNo) {
+	this.orderNo = orderNo;
     }
 
     public String getName() {
@@ -44,9 +54,9 @@ public class StockCategory {
     public void setName(String name) {
 	this.name = name;
     }
-    
+
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+	return ToStringBuilder.reflectionToString(this);
     }
 }

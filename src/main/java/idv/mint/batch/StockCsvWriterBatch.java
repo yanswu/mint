@@ -28,10 +28,22 @@ public class StockCsvWriterBatch {
 	FastDateFormat dateFormat = DateFormatUtils.ISO_DATETIME_FORMAT;
 	
 	
-//	task1();
-//	task2();
-//	task3();
+	// 1. stock category
+	stockCategoryWriterTask(StockMarketType.TSE);
+	stockCategoryWriterTask(StockMarketType.OTC);
+	
+	// 2. stock
+	stockWriterTask(StockMarketType.TSE);
+	stockWriterTask(StockMarketType.OTC);
+	
+	// 3. stock EPS
+	stockEPSWriterTask(StockMarketType.TSE);
+	stockEPSWriterTask(StockMarketType.OTC);
+	
 //	task4();
+	stockDividendWriterTask(StockMarketType.TSE);
+	stockDividendWriterTask(StockMarketType.OTC);
+	
 	Date endDate = new Date();
 	System.out.println("task start time "+ dateFormat.format(startDate));
 	System.out.println("task end   time "+ dateFormat.format(endDate));
@@ -44,13 +56,6 @@ public class StockCsvWriterBatch {
         return (int) ((dateEnd.getTime() - dateStart.getTime()) / (1000 * 60) );  
     }  
 
-    public static void task1() throws IOException {
-
-	// TSE Category
-	stockCategoryWriterTask(StockMarketType.TSE);
-	// OTC Category
-	stockCategoryWriterTask(StockMarketType.OTC);
-    }
     
     private static void stockCategoryWriterTask(StockMarketType marketType) throws IOException {
 
@@ -74,12 +79,6 @@ public class StockCsvWriterBatch {
     }
 
     
-    public static void task2() throws Exception {
-
-	stockWriterTask(StockMarketType.TSE);
-
-	stockWriterTask(StockMarketType.OTC);
-    }
 
 
     private static void stockWriterTask(StockMarketType marketType) throws Exception {
@@ -136,9 +135,7 @@ public class StockCsvWriterBatch {
 
     public static void task3() throws Exception {
 
-	stockEPSWriterTask(StockMarketType.TSE);
 
-	stockEPSWriterTask(StockMarketType.OTC);
     }
 
     private static void stockEPSWriterTask(StockMarketType marketType) throws IOException {
@@ -171,9 +168,7 @@ public class StockCsvWriterBatch {
     
     public static void task4() throws Exception {
 
-	stockDividendWriterTask(StockMarketType.TSE);
 
-	stockDividendWriterTask(StockMarketType.OTC);
     }
     
     private static void stockDividendWriterTask(StockMarketType marketType) throws IOException {

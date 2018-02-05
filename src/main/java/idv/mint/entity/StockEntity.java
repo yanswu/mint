@@ -8,7 +8,6 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -36,12 +35,12 @@ public class StockEntity implements Serializable {
     private Integer overseasType;
 
     @Column(name = "STOCK_CATEGORY_ID")
-    private Integer stockCategoryId;
+    private String stockCategoryId;
 
     public StockEntity() {
     }
 
-    public StockEntity(String stockId,String stockName,OverseasType overseasType,Integer stockCategoryId) {
+    public StockEntity(String stockId,String stockName,OverseasType overseasType,String stockCategoryId) {
 	this.stockId = stockId;
 	this.stockName = stockName;
 	this.overseasType = overseasType.getValue();
@@ -77,11 +76,11 @@ public class StockEntity implements Serializable {
 	this.overseasType = overseasType;
     }
 
-    public Integer getStockCategoryId() {
+    public String getStockCategoryId() {
 	return stockCategoryId;
     }
 
-    public void setStockCategoryId(Integer stockCategoryId) {
+    public void setStockCategoryId(String stockCategoryId) {
 	this.stockCategoryId = stockCategoryId;
     }
 

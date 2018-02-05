@@ -22,7 +22,7 @@ public class StockCategoryEntity implements Serializable {
 
     @Id
     @Column(name = "STOCK_CATEGORY_ID")
-    private Integer stockCategoryId;
+    private String stockCategoryId;
 
     @Column(name = "MARKET_TYPE", nullable = false)
     private Integer marketType;
@@ -40,11 +40,11 @@ public class StockCategoryEntity implements Serializable {
     public StockCategoryEntity() {
     }
 
-    public Integer getStockCategoryId() {
+    public String getStockCategoryId() {
 	return stockCategoryId;
     }
 
-    public void setStockCategoryId(Integer stockCategoryId) {
+    public void setStockCategoryId(String stockCategoryId) {
 	this.stockCategoryId = stockCategoryId;
     }
 

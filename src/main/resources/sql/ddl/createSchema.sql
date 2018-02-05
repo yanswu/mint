@@ -1,5 +1,5 @@
 CREATE TABLE T_STOCK_CATEGORY(
-	 	STOCK_CATEGORY_ID int4 not null,
+	 	STOCK_CATEGORY_ID varchar(10) not null,
         MARKET_TYPE varchar(10) not null,
         CATEGORY_NAME varchar(100),
         ORDER_NO int4,
@@ -10,7 +10,7 @@ CREATE TABLE T_STOCK(
         STOCK_ID varchar(10) not null,
         STOCK_NAME varchar(255) ,
         OVERSEAS_TYPE int2  null,
-        STOCK_CATEGORY_ID int4,
+        STOCK_CATEGORY_ID varchar(10) not null,
         primary key (STOCK_ID),
         FOREIGN KEY (STOCK_CATEGORY_ID) REFERENCES T_STOCK_CATEGORY(STOCK_CATEGORY_ID)
 );

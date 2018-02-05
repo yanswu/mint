@@ -24,11 +24,11 @@ public class StockCreatorTest {
 	StockCategory otcStockCategory = list.get(1);
 	
 	assertTrue(tseStockCategory.getMarketType().isTSE());
-	assertTrue(tseStockCategory.getSequence() == 6);
+	assertTrue(tseStockCategory.getOrderNo() == 6);
 	assertTrue(StringUtils.equals(tseStockCategory.getName(), "TseCategoryName"));
 
 	assertTrue(otcStockCategory.getMarketType().isOTC());
-	assertTrue(otcStockCategory.getSequence() == 7);
+	assertTrue(otcStockCategory.getOrderNo() == 7);
 	assertTrue(StringUtils.equals(otcStockCategory.getName(), "OtcCategoryName"));
 	
 	

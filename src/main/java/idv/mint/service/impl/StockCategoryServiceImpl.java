@@ -1,7 +1,6 @@
 package idv.mint.service.impl;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -26,19 +25,26 @@ public class StockCategoryServiceImpl implements StockCategoryService {
 	
 	if(CollectionUtils.isNotEmpty(list)) {
 	    
-	    AtomicInteger index = new AtomicInteger();
-	    
+//	    AtomicInteger index = new AtomicInteger();
+//	    index.incrementAndGet();
 	    List<StockCategoryEntity> entityList = list.stream().map(category->{
 		
+		Integer marketTypeValue = category.getMarketType().getValue();
+		Integer orderNo = category.getOrderNo();
+
 		StockCategoryEntity entity = new StockCategoryEntity();
-		entity.setStockCategoryId(index.incrementAndGet());
-		entity.setMarketType(category.getMarketType().getValue());
+
+		entity.setStockCategoryId(String.valueOf(marketTypeValue)+String.valueOf(orderNo));
+		entity.setMarketType(marketTypeValue);
 		entity.setCategoryName(category.getName());
-		entity.setOrderNo(category.getSequence());
+		entity.setOrderNo(orderNo);
+		
 		return entity;
+		
 	    }).collect(Collectors.toList());
 	    
 	    entityList.stream().forEach(entity->{
+		
 		stockCategoryDao.persist(entity);		
 	    });
 

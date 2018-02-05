@@ -42,7 +42,25 @@ public class StockCreator {
 	    
 	    list = lines.stream().map(line -> {
 		String[] sections = StringUtils.split(line, ",");
-		return new Stock(sections[3], sections[4]);
+		
+		    String marketTypeStr = sections[0];
+		    String orderNo = sections[1];
+		    String stockCode = sections[3];
+		    String stockName = sections[4];
+
+		    Stock stock = new Stock();
+		    stock.setStockCode(stockCode);
+		    stock.setStockName(stockName);
+		    
+		    StockCategory stockCategory = new StockCategory();
+		    stockCategory.setMarketType(StockMarketType.find(Integer.parseInt(marketTypeStr)));
+		    stockCategory.setOrderNo(Integer.parseInt(orderNo));
+		    stockCategory.setStockCategoryId(marketTypeStr + orderNo);
+		    
+		    stock.setStockCategory(stockCategory);
+		    
+		return stock;
+		
 	    }).collect(Collectors.toList());
 	}
 	return list;
