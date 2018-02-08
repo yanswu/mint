@@ -4,125 +4,97 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.FastDateFormat;
 
+import idv.mint.batch.type.BatchStatusType;
 import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
+import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
 import idv.mint.util.FileUtils;
 import idv.mint.util.crawl.Crawler;
 import idv.mint.util.stock.StockCreator;
 
-public class StockCsvWriterBatch {
+public class StockCsvWriterBatch extends AbstractInitBatch {
+
+    @Override
+    public BatchStatusType process() throws Exception {
+
+	// 1. stock category
+	stockCategoryCsvWriter(StockMarketType.TSE, PathSettings.STOCK_CATEGORY_TSE_CSV);
+	stockCategoryCsvWriter(StockMarketType.OTC, PathSettings.STOCK_CATEGORY_OTC_CSV);
+
+	// 2. stock
+	stockCsvWriter(StockMarketType.TSE, PathSettings.STOCK_CATEGORY_TSE_CSV, PathSettings.STOCK_TSE_CSV);
+	stockCsvWriter(StockMarketType.OTC, PathSettings.STOCK_CATEGORY_OTC_CSV, PathSettings.STOCK_OTC_CSV);
+
+	// 3. stock EPS
+	stockEPSCsvWriter(StockMarketType.TSE, PathSettings.STOCK_TSE_CSV, PathSettings.STOCK_EPS_TSE_CSV);
+	stockEPSCsvWriter(StockMarketType.OTC, PathSettings.STOCK_OTC_CSV, PathSettings.STOCK_EPS_OTC_CSV);
+
+	// 4. stock dividends;
+	stockDividendCsvWriter(StockMarketType.TSE, PathSettings.STOCK_TSE_CSV, PathSettings.STOCK_DIVIDEND_TSE_CSV);
+	stockDividendCsvWriter(StockMarketType.OTC, PathSettings.STOCK_OTC_CSV, PathSettings.STOCK_DIVIDEND_OTC_CSV);
+	
+	return BatchStatusType.SUCCESS;
+    }
 
     public static void main(String[] args) throws Exception {
-	
-	Date startDate = new Date();
-	FastDateFormat dateFormat = DateFormatUtils.ISO_DATETIME_FORMAT;
-	
-	
-	// 1. stock category
-	stockCategoryWriterTask(StockMarketType.TSE);
-	stockCategoryWriterTask(StockMarketType.OTC);
-	
-	// 2. stock
-	stockWriterTask(StockMarketType.TSE);
-	stockWriterTask(StockMarketType.OTC);
-	
-	// 3. stock EPS
-	stockEPSWriterTask(StockMarketType.TSE);
-	stockEPSWriterTask(StockMarketType.OTC);
-	
-//	task4();
-	stockDividendWriterTask(StockMarketType.TSE);
-	stockDividendWriterTask(StockMarketType.OTC);
-	
-	Date endDate = new Date();
-	System.out.println("task start time "+ dateFormat.format(startDate));
-	System.out.println("task end   time "+ dateFormat.format(endDate));
-	System.out.println("it spends "+ getDiscrepantMinus(startDate, endDate)+" mins");
-	
 
+//	StockCsvWriterBatch stockCsvWriterBatch = new StockCsvWriterBatch();
+//	stockCsvWriterBatch.execute();
+//	stockCsvWriterBatch.getBatchProcessSeconds();
+	
     }
-    
-    public static int getDiscrepantMinus(Date dateStart, Date dateEnd) {  
-        return (int) ((dateEnd.getTime() - dateStart.getTime()) / (1000 * 60) );  
-    }  
 
-    
-    private static void stockCategoryWriterTask(StockMarketType marketType) throws IOException {
+    private static void stockCategoryCsvWriter(StockMarketType marketType, PathSettings inPathSettings) throws IOException {
 
-	Path writePath = null;
+	Path writePath = inPathSettings.getPath();
 
-	if (marketType.isTSE()) {
-	    writePath = PathSettings.STOCK_CATEGORY_TSE_CSV.getPath();
-	} else if (marketType.isOTC()) {
-	    writePath = PathSettings.STOCK_CATEGORY_OTC_CSV.getPath();
-	}
-	
-	// 1. clean file content
-	FileUtils.cleanFile(writePath);
-	
-	// 2. parser web html info
+	// 1. parser HTML
 	Crawler crawler = Crawler.createWebCrawler();
-	List<String> lines = crawler.getStockCategory(StockMarketType.TSE);
+	List<String> lines = crawler.getStockCategory(marketType);
+
+	// 2. clean file content
+	FileUtils.cleanFile(writePath);
 
 	// 3. write files
 	FileUtils.writeFile(writePath, lines);
     }
 
-    
+    private void stockCsvWriter(StockMarketType marketType, PathSettings inPath, PathSettings outPath) throws Exception {
 
+	Path readPath = inPath.getPath();
+	Path writePath = outPath.getPath();
 
-    private static void stockWriterTask(StockMarketType marketType) throws Exception {
+	List<String> categoryLines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
 
-	List<String> categoryLines = null;
-	Path readPath = null;
-	Path writePath = null;
-
-	if (marketType.isTSE()) {
-
-	    readPath = PathSettings.STOCK_CATEGORY_TSE_CSV.getPath();
-	    writePath = PathSettings.STOCK_TSE_CSV.getPath();
-
-	} else if (marketType.isOTC()) {
-
-	    readPath = PathSettings.STOCK_CATEGORY_OTC_CSV.getPath();
-	    writePath = PathSettings.STOCK_OTC_CSV.getPath();
-	}
-
-	categoryLines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
-	
-
-	if (!CollectionUtils.isNotEmpty(categoryLines)) {
+	if (CollectionUtils.isNotEmpty(categoryLines)) {
 
 	    Crawler crawler = Crawler.createWebCrawler();
-	    
-	    FileUtils.cleanFile(writePath);
-	    
+
 	    List<StockCategory> stockCategoryList = StockCreator.createStockCategoryList(categoryLines);
-	    
+
+	    FileUtils.cleanFile(writePath);
+
 	    for (StockCategory stockCategory : stockCategoryList) {
 
 		List<String> lines = crawler.getStock(marketType, stockCategory.getName());
 
 		List<String> textLines = lines.stream().map(line -> {
-		    
+
 		    // pattern : marketType,sequence,stockCategoryName,stockCode,stockName
 		    StringBuilder sb = new StringBuilder();
 		    sb.append(stockCategory.getMarketType().getValue());
-		    sb.append(",");
+		    sb.append(SymbolType.COMMA);
 		    sb.append(stockCategory.getOrderNo());
-		    sb.append(",");
+		    sb.append(SymbolType.COMMA);
 		    sb.append(stockCategory.getName());
-		    sb.append(",");
+		    sb.append(SymbolType.COMMA);
 		    sb.append(line);
 		    return sb.toString();
 
@@ -133,65 +105,42 @@ public class StockCsvWriterBatch {
 	}
     }
 
-    public static void task3() throws Exception {
+    private void stockEPSCsvWriter(StockMarketType marketType, PathSettings inPathSettings, PathSettings outPathSettings) throws IOException {
 
+	Path readPath = inPathSettings.getPath();
+	Path writePath = outPathSettings.getPath();
 
-    }
+	List<String> lines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
 
-    private static void stockEPSWriterTask(StockMarketType marketType) throws IOException {
+	if (CollectionUtils.isNotEmpty(lines)) {
 
-	List<String> lines = null;
-	Path readPath = null;
-	Path writePath = null;
-
-	if (marketType.isTSE()) {
-	    readPath = PathSettings.STOCK_TSE_CSV.getPath();
-	    writePath = PathSettings.STOCK_EPS_TSE_CSV.getPath();
-
-	} else if (marketType.isOTC()) {
-	    readPath = PathSettings.STOCK_OTC_CSV.getPath();
-	    writePath = PathSettings.STOCK_EPS_OTC_CSV.getPath();
-	}
-	
-	lines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
-	FileUtils.cleanFile(writePath);
-
-	if (!CollectionUtils.isNotEmpty(lines)) {
 	    Crawler crawler = Crawler.createWebCrawler();
 	    List<Stock> stockList = StockCreator.createStockList(lines);
+
+	    FileUtils.cleanFile(writePath);
+
 	    for (Stock stock : stockList) {
 		// pattern : stockCode, pageStockCode, year, q1, q2, q3, q4
 		FileUtils.writeFileAppend(writePath, crawler.getStockEPS(stock.getStockCode()));
 	    }
 	}
     }
-    
-    public static void task4() throws Exception {
 
+    private void stockDividendCsvWriter(StockMarketType marketType, PathSettings inPathSettings, PathSettings outPathSettings) throws IOException {
 
-    }
-    
-    private static void stockDividendWriterTask(StockMarketType marketType) throws IOException {
+	Path readPath = inPathSettings.getPath();
+	Path writePath = outPathSettings.getPath();
 
-	List<String> lines = null;
-	Path readPath = null;
-	Path writePath = null;
+	List<String> lines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
 
-	if (marketType.isTSE()) {
-	    readPath = PathSettings.STOCK_TSE_CSV.getPath();
-	    writePath = PathSettings.STOCK_DIVIDEND_TSE_CSV.getPath();
+	if (CollectionUtils.isNotEmpty(lines)) {
 
-	} else if (marketType.isOTC()) {
-	    readPath = PathSettings.STOCK_OTC_CSV.getPath();
-	    writePath = PathSettings.STOCK_DIVIDEND_OTC_CSV.getPath();
-	}
-	
-	FileUtils.cleanFile(writePath);
-	lines = Files.readAllLines(readPath, StandardCharsets.UTF_8);
-
-	if (!CollectionUtils.isEmpty(lines)) {
-	    Crawler crawler = Crawler.createWebCrawler();
 	    List<Stock> stockList = StockCreator.createStockList(lines);
+
+	    FileUtils.cleanFile(writePath);
+
+	    Crawler crawler = Crawler.createWebCrawler();
+
 	    for (Stock stock : stockList) {
 		// pattern : stockCode, rocYear, cashDividend, stockDividend
 		FileUtils.writeFileAppend(writePath, crawler.getStockDividend(stock.getStockCode()));
