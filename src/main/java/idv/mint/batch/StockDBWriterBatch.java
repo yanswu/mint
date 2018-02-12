@@ -28,16 +28,16 @@ public class StockDBWriterBatch extends AbstractRootBatch {
 	List<StockMarketType> marketTypes = Arrays.asList(StockMarketType.TSE, StockMarketType.OTC);
 
 	// 1. insert stockCategory
-//	for (StockMarketType stockMarketType : marketTypes) {
-//	    List<StockCategory> stockCategoryList = crawlerService.getStockCategoryList(fileCrawlType, stockMarketType);
-//	    stockCategoryService.saveStockCategoryEntities(stockCategoryList);
-//	}
+	for (StockMarketType stockMarketType : marketTypes) {
+	    List<StockCategory> stockCategoryList = crawlerService.getStockCategoryList(fileCrawlType, stockMarketType);
+	    stockCategoryService.saveStockCategoryEntities(stockCategoryList);
+	}
 
 	// 2. insert stock
-//	for (StockMarketType stockMarketType : marketTypes) {
-//	    List<Stock> stockList = crawlerService.getStockList(fileCrawlType, stockMarketType);
-//	    stockService.saveStockEntities(stockList);
-//	}
+	for (StockMarketType stockMarketType : marketTypes) {
+	    List<Stock> stockList = crawlerService.getStockList(fileCrawlType, stockMarketType);
+	    stockService.saveStockEntities(stockList);
+	}
 
 	// 3.insert stockSheet
 	for (StockMarketType stockMarketType : marketTypes) {
