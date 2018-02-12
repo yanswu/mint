@@ -18,6 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import idv.mint.context.enums.EncodingType;
+import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.util.CharUtils;
 import idv.mint.util.JsoupUtils;
@@ -42,7 +43,7 @@ public class WebCrawler implements Crawler {
      * @throws IOException
      */
     @Override
-    public List<String> getStockCategory(StockMarketType marketType) throws IOException {
+    public List<String> getStockCategoryLines(StockMarketType marketType) throws IOException {
 
 	String url = "https://tw.stock.yahoo.com/h/getclass.php#table1";
 	Document document = JsoupUtils.getDocument(url);
@@ -63,19 +64,47 @@ public class WebCrawler implements Crawler {
 	}
 
 	if (htmlTDList != null) {
+
+	    String comma = SymbolType.COMMA.getValue();
+
 	    return IntStream.range(0, htmlTDList.size()).mapToObj(i -> {
 		String sequence = String.valueOf(i + 1);
 		String categoryName = StringUtils.trimToEmpty(htmlTDList.get(i).text());
-		return String.join(",", String.valueOf(marketType.getValue()), sequence, categoryName);
+		return String.join(comma, String.valueOf(marketType.getValue()), sequence, categoryName);
 	    }).collect(Collectors.toList());
+
 	}
 
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStock(StockMarketType marketType, String categoryName) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType) throws IOException {
 
+	// pattern :marketType(1,2), sequence, categoryName
+	List<String> stockCategoryLines = this.getStockCategoryLines(marketType);
+
+	String comma = SymbolType.COMMA.getValue();
+
+	List<String> stockLines = new ArrayList<>();
+
+	for (String categoryLine : stockCategoryLines) {
+	    String[] sections = StringUtils.split(categoryLine, comma);
+	    String categoryName = sections[2];
+	    // pattern : stockCode,stockName
+	    List<String> lines = getStock(marketType, categoryName, RETRY_TIMES);
+	    for (String line : lines) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(categoryLine).append(comma).append(line);
+		stockLines.add(sb.toString());
+	    }
+	}
+	return stockLines;
+    }
+
+    @Override
+    public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
+	// crate pattern : stockCode,stockName
 	return getStock(marketType, categoryName, RETRY_TIMES);
     }
 
@@ -99,7 +128,7 @@ public class WebCrawler implements Crawler {
 		    String stockName = sections[1];
 		    String currentStockName = getCurrentStockName(stockCode, stockName);
 		    StringBuilder sb = new StringBuilder();
-		    return sb.append(stockCode).append(",").append(currentStockName).toString();
+		    return sb.append(stockCode).append(SymbolType.COMMA.getValue()).append(currentStockName).toString();
 		}).collect(Collectors.toList());
 	    }
 	} catch (Exception e) {
@@ -129,7 +158,7 @@ public class WebCrawler implements Crawler {
      * @throws IOException
      */
     @Override
-    public List<String> getStockEPS(String stockCode) throws IOException {
+    public List<String> getStockEPSLines(String stockCode) throws IOException {
 
 	return this.getStockEPS(stockCode, RETRY_TIMES);
 
@@ -201,7 +230,7 @@ public class WebCrawler implements Crawler {
      * </pre>
      */
     @Override
-    public List<String> getStockDividend(String stockCode) throws IOException {
+    public List<String> getStockDividendLines(String stockCode) throws IOException {
 
 	return this.getStockDividend(stockCode, RETRY_TIMES);
     }

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
 import idv.mint.util.crawl.Crawler;
@@ -17,7 +18,7 @@ import idv.mint.util.stock.StockCreator;
 public class FileCrawler implements Crawler {
 
     @Override
-    public List<String> getStockCategory(StockMarketType marketType) throws IOException {
+    public List<String> getStockCategoryLines(StockMarketType marketType) throws IOException {
 
 	Path path = null;
 
@@ -38,7 +39,7 @@ public class FileCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockEPS(String stockCode) throws IOException {
+    public List<String> getStockEPSLines(String stockCode) throws IOException {
 
 	StockMarketType stockMarketType = getStockMarketType(stockCode);
 
@@ -62,7 +63,7 @@ public class FileCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockDividend(String stockCode) throws IOException {
+    public List<String> getStockDividendLines(String stockCode) throws IOException {
 
 	StockMarketType stockMarketType = getStockMarketType(stockCode);
 
@@ -76,17 +77,21 @@ public class FileCrawler implements Crawler {
 
 	if (readPath != null) {
 
+	    String comma = SymbolType.COMMA.getValue();
+	    
 	    List<String> lines = Files.readAllLines(readPath);
+	    
 	    return lines.stream().filter(line -> {
-		return StringUtils.equals(stockCode, StringUtils.split(line, ",")[0]);
+		return StringUtils.equals(stockCode, StringUtils.split(line, comma)[0]);
 	    }).collect(Collectors.toList());
+	    
 	}
 
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStock(StockMarketType marketType, String categoryName) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType) throws IOException {
 
 	if (marketType == null || marketType.isUnknown()) {
 	    return new ArrayList<>();
@@ -100,9 +105,19 @@ public class FileCrawler implements Crawler {
 	    path = PathSettings.STOCK_OTC_CSV.getPath();
 	}
 
-	List<String> lines = Files.readAllLines(path);
+	return Files.readAllLines(path);
+	
+    }
+
+    @Override
+    public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
+	
+	List<String> lines = getStockLines(marketType);
+	
+	String comma = SymbolType.COMMA.getValue();
+	
 	return lines.stream().filter(line ->{
-	    String[] sections = StringUtils.split(line,",");
+	    String[] sections = StringUtils.split(line,comma);
 	    return StringUtils.equals(categoryName, sections[2]);
 	}).collect(Collectors.toList());
 	

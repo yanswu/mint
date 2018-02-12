@@ -10,24 +10,29 @@ import idv.mint.util.crawl.Crawler;
 public class NonOpCrawler implements Crawler {
 
     @Override
-    public List<String> getStockCategory(StockMarketType marketType) throws IOException {
+    public List<String> getStockCategoryLines(StockMarketType marketType) throws IOException {
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStockEPS(String stockCode) throws IOException {
+    public List<String> getStockEPSLines(String stockCode) throws IOException {
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStockDividend(String stockCode) throws IOException {
+    public List<String> getStockDividendLines(String stockCode) throws IOException {
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStock(StockMarketType marketType, String categoryName) throws IOException {
-	// TODO Auto-generated method stub
-	return null;
+    public List<String> getStockLines(StockMarketType marketType) throws IOException {
+	return new ArrayList<>();
     }
+
+    @Override
+    public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
+	return new ArrayList<>();
+    }
+
 
 }

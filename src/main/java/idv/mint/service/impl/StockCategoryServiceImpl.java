@@ -15,42 +15,37 @@ import idv.mint.service.StockCategoryService;
 
 @Service("stockCategoryService")
 public class StockCategoryServiceImpl implements StockCategoryService {
-    
+
     @Autowired
     private StockCategoryDao stockCategoryDao;
-    
+
     @Override
     @Transactional
     public void saveStockCategoryEntities(List<StockCategory> list) {
-	
-	if(CollectionUtils.isNotEmpty(list)) {
-	    
-//	    AtomicInteger index = new AtomicInteger();
-//	    index.incrementAndGet();
-	    List<StockCategoryEntity> entityList = list.stream().map(category->{
-		
-		Integer marketTypeValue = category.getMarketType().getValue();
-		Integer orderNo = category.getOrderNo();
+
+	if (CollectionUtils.isNotEmpty(list)) {
+
+	    // AtomicInteger index = new AtomicInteger();
+	    // index.incrementAndGet();
+	    List<StockCategoryEntity> entityList = list.stream().map(category -> {
 
 		StockCategoryEntity entity = new StockCategoryEntity();
 
-		entity.setStockCategoryId(String.valueOf(marketTypeValue)+String.valueOf(orderNo));
-		entity.setMarketType(marketTypeValue);
+		entity.setMarketType(category.getMarketType().getValue());
+		entity.setOrderNo(category.getOrderNo());
 		entity.setCategoryName(category.getName());
-		entity.setOrderNo(orderNo);
-		
+		entity.setStockCategoryId(category.getStockCategoryId());
+
 		return entity;
-		
+
 	    }).collect(Collectors.toList());
-	    
-	    entityList.stream().forEach(entity->{
-		
-		stockCategoryDao.persist(entity);		
+
+	    entityList.stream().forEach(entity -> {
+		stockCategoryDao.persist(entity);
 	    });
 
 	}
-	    
-	
+
     }
 
 }
