@@ -19,7 +19,7 @@ import idv.mint.util.FileUtils;
 import idv.mint.util.crawl.Crawler;
 import idv.mint.util.stock.StockCreator;
 
-public class StockCsvWriterBatch extends AbstractInitBatch {
+public class StockCsvWriterBatch extends AbstractRootBatch {
 
     @Override
     public BatchStatusType process() throws Exception {
@@ -44,10 +44,9 @@ public class StockCsvWriterBatch extends AbstractInitBatch {
     }
 
     public static void main(String[] args) throws Exception {
-
-//	StockCsvWriterBatch stockCsvWriterBatch = new StockCsvWriterBatch();
-//	stockCsvWriterBatch.execute();
-//	stockCsvWriterBatch.getBatchProcessSeconds();
+	
+	StockCsvWriterBatch stockCsvWriterBatch = new StockCsvWriterBatch();
+	stockCsvWriterBatch.execute();
 	
     }
 
@@ -57,7 +56,7 @@ public class StockCsvWriterBatch extends AbstractInitBatch {
 
 	// 1. parser HTML
 	Crawler crawler = Crawler.createWebCrawler();
-	List<String> lines = crawler.getStockCategory(marketType);
+	List<String> lines = crawler.getStockCategoryLines(marketType);
 
 	// 2. clean file content
 	FileUtils.cleanFile(writePath);
@@ -81,20 +80,23 @@ public class StockCsvWriterBatch extends AbstractInitBatch {
 
 	    FileUtils.cleanFile(writePath);
 
+	    String comma = SymbolType.COMMA.getValue();
+
 	    for (StockCategory stockCategory : stockCategoryList) {
 
-		List<String> lines = crawler.getStock(marketType, stockCategory.getName());
+		List<String> lines = crawler.getStockLines(marketType, stockCategory.getName());
 
 		List<String> textLines = lines.stream().map(line -> {
 
 		    // pattern : marketType,sequence,stockCategoryName,stockCode,stockName
 		    StringBuilder sb = new StringBuilder();
+		    
 		    sb.append(stockCategory.getMarketType().getValue());
-		    sb.append(SymbolType.COMMA);
+		    sb.append(comma);
 		    sb.append(stockCategory.getOrderNo());
-		    sb.append(SymbolType.COMMA);
+		    sb.append(comma);
 		    sb.append(stockCategory.getName());
-		    sb.append(SymbolType.COMMA);
+		    sb.append(comma);
 		    sb.append(line);
 		    return sb.toString();
 
@@ -121,7 +123,7 @@ public class StockCsvWriterBatch extends AbstractInitBatch {
 
 	    for (Stock stock : stockList) {
 		// pattern : stockCode, pageStockCode, year, q1, q2, q3, q4
-		FileUtils.writeFileAppend(writePath, crawler.getStockEPS(stock.getStockCode()));
+		FileUtils.writeFileAppend(writePath, crawler.getStockEPSLines(stock.getStockCode()));
 	    }
 	}
     }
@@ -143,7 +145,7 @@ public class StockCsvWriterBatch extends AbstractInitBatch {
 
 	    for (Stock stock : stockList) {
 		// pattern : stockCode, rocYear, cashDividend, stockDividend
-		FileUtils.writeFileAppend(writePath, crawler.getStockDividend(stock.getStockCode()));
+		FileUtils.writeFileAppend(writePath, crawler.getStockDividendLines(stock.getStockCode()));
 	    }
 	}
     }

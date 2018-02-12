@@ -3,6 +3,7 @@ package idv.mint.service;
 import java.io.IOException;
 import java.util.List;
 
+import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
 import idv.mint.bean.StockSheet;
 import idv.mint.entity.enums.StockMarketType;
@@ -19,16 +20,30 @@ public interface CrawlerService {
      * @return
      * @throws IOException
      */
-    public List<StockCategory> getStockCategory(CrawlType type, StockMarketType marketType) throws IOException;
+    public List<StockCategory> getStockCategoryList(CrawlType type, StockMarketType marketType) throws IOException;
 
     /**
      * <pre>
      *    取得 TSE OTC  市場 目錄
      * </pre>
+     * @param crawlType
      * @return
      * @throws IOException
      */
-    public List<StockCategory> getAllStockCategories(CrawlType type) throws IOException;
+    public List<StockCategory> getAllStockCategories(CrawlType crawlType) throws IOException;
+    
+
+    
+    /**
+     * <pre>
+     * 
+     * </pre>
+     * @param crawlType
+     * @param marketType
+     * @return
+     * @throws IOException
+     */
+    public List<Stock> getStockList(CrawlType crawlType,StockMarketType marketType) throws IOException;
 
     /**
      * 
@@ -37,5 +52,14 @@ public interface CrawlerService {
      * @throws IOException
      */
     public List<StockSheet> getStockSheetList(CrawlType type, String stockCode) throws IOException;
+
+    /**
+     * 
+     * @param type
+     * @param marketType
+     * @return
+     * @throws IOException
+     */
+    public List<StockSheet> getStockSheetList(CrawlType type, StockMarketType marketType) throws IOException;
 
 }

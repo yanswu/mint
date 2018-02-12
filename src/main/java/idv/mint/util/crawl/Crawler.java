@@ -31,26 +31,37 @@ public interface Crawler {
      * @return
      * @throws IOException
      */
-    public List<String> getStockCategory(StockMarketType marketType) throws IOException;
+    public List<String> getStockCategoryLines(StockMarketType marketType) throws IOException;
     
     
     /**
      * <pre>
-     *  stockCode,stockName (股票代碼  股票名稱)
+     *  marketType,categoryName (市場分類, 分類名稱)
      * </pre>
      * @param marketType
      * @param categoryName
      * @return
      * @throws IOException
      */
-    public List<String> getStock(StockMarketType marketType,String categoryName)throws IOException;
+    public List<String> getStockLines(StockMarketType marketType,String categoryName)throws IOException;
+    /**
+     * <pre>
+     *  marketType (市場分類)
+     * </pre>
+     * @param marketType
+     * @return
+     * @throws IOException
+     */
+    public List<String> getStockLines(StockMarketType marketType)throws IOException;
+    
+    
     /**
      * 取得歷年度EPS
      * @param stockCode
      * @return
      * @throws IOException
      */
-    public List<String> getStockEPS(String stockCode) throws IOException ;
+    public List<String> getStockEPSLines(String stockCode) throws IOException ;
     
     /**
      * 取得歷年度股利(股票股利 現金股利)
@@ -59,5 +70,5 @@ public interface Crawler {
      * @return
      * @throws IOException
      */
-    public List<String> getStockDividend(String stockCode) throws IOException ;
+    public List<String> getStockDividendLines(String stockCode) throws IOException ;
 }

@@ -33,6 +33,11 @@ public class StockSheetPk implements Serializable {
 
     public StockSheetPk() {
     }
+    
+    public StockSheetPk(String stockId,LocalDate calYear) {
+	this.stockId = stockId;
+	this.calYear = calYear;
+    }
 
     public String getStockId() {
 	return stockId;

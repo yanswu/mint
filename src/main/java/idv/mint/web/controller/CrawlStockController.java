@@ -37,7 +37,7 @@ public class CrawlStockController {
 	    if (StringUtils.isNotBlank(marketType) && StringUtils.isNumeric(marketType)) {
 		StockMarketType stockMarketType = StockMarketType.find(Integer.parseInt(marketType));
 		if (!stockMarketType.isUnknown()) {
-		    List<StockCategory> categories = crawlService.getStockCategory(CrawlType.ONLINE,stockMarketType);
+		    List<StockCategory> categories = crawlService.getStockCategoryList(CrawlType.ONLINE,stockMarketType);
 		    return new ResponseEntity<List<StockCategory>>(categories,HttpStatus.OK);
 		}
 	    }

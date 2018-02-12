@@ -16,7 +16,7 @@ CREATE TABLE T_STOCK(
 );
 
 create table T_STOCK_SHEET (
-        MASTER_ID int8 not null,
+        STOCK_ID varchar(10) not null,
         CAL_YEAR date not null,
         EPS_Q1 numeric(19, 2),
         EPS_Q2 numeric(19, 2),
@@ -26,5 +26,5 @@ create table T_STOCK_SHEET (
         STOCK_DIVIDEND numeric(19, 2),
         NET_INCOME numeric(19, 2),
         ROE_RATE numeric(19, 2),
-        primary key (CAL_YEAR, MASTER_ID)
+        primary key (STOCK_ID,CAL_YEAR)
     );

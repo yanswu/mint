@@ -2,7 +2,9 @@ package idv.mint.batch;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -11,11 +13,13 @@ import idv.mint.batch.type.BatchStatusType;
 import idv.mint.context.config.AppConfig;
 import idv.mint.context.config.JpaConfig;
 
-public abstract class AbstractInitBatch {
+public abstract class AbstractRootBatch {
     
-    protected static final Logger logger = LogManager.getLogger(AbstractInitBatch.class);
+    protected static final Logger logger = LogManager.getLogger(AbstractRootBatch.class);
 
-    private static AnnotationConfigApplicationContext context = null;
+    private AnnotationConfigApplicationContext context = null;
+    
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private LocalDateTime taskStartTime;
     
@@ -23,13 +27,13 @@ public abstract class AbstractInitBatch {
     
     private BatchStatusType statusType;
     
-    static {
+    private void initializedSpringConfig() {
 	context = new AnnotationConfigApplicationContext();
 	context.register(AppConfig.class, JpaConfig.class);
 	context.refresh();
     }
 
-    protected <T> T getSpringContext(Class<T> clazz) {
+    protected <T> T getSpringBean(Class<T> clazz) {
 	return context.getBean(clazz);
     }
 
@@ -37,30 +41,44 @@ public abstract class AbstractInitBatch {
 
     
     public void execute() {
-
+	
+	initializedSpringConfig();
+	
 	taskStartTime = LocalDateTime.now();
+	
 	try {
 	    statusType = process();
 	} catch (Exception e) {
 	    logger.error(e,e);
 	    statusType = BatchStatusType.FAILED;
 	}
+	
 	taskEndTime = LocalDateTime.now();
+	
+	
+	logger.info("Task startTime ["+this.getStartTime()+"], endTime ["+this.getEndTime()+"]");
+	logger.info("it spends "+this.getBatchProcessSeconds()+" seconds");
+	logger.info("the Task BatchStatus is "+ getBatchStatusType());
+	
 	context.close();
     }
 
     protected String getStartTime() {
-	return null;
+	return taskStartTime != null ? taskStartTime.format(formatter) : StringUtils.EMPTY;
     }
 
     protected String getEndTime() {
-	return null;
+	return taskEndTime != null ? taskEndTime.format(formatter) : StringUtils.EMPTY;
     }
 
     protected long getBatchProcessSeconds() {
-
-	Duration duration = Duration.between(taskStartTime, taskEndTime);
-	long seconds = duration.getSeconds();
+	
+	long seconds = 0;
+	
+	if(taskStartTime != null && taskEndTime != null) {
+	    Duration duration = Duration.between(taskStartTime, taskEndTime);
+	    seconds = duration.getSeconds();
+	}
 	return seconds;
     }
 
