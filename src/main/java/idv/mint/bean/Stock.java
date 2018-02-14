@@ -12,16 +12,16 @@ public class Stock {
 
     private StockCategory stockCategory;
 
-    private List<StockSheet> epsSheetList;
-    
+    private List<StockSheet> stockSheetList;
+
     public Stock() {
     }
-    
-    public Stock(String stockCode,String stockName) {
+
+    public Stock(String stockCode, String stockName) {
 	this.stockCode = stockCode;
 	this.stockName = stockName;
     }
-    
+
     public String getStockCode() {
 	return stockCode;
     }
@@ -46,18 +46,16 @@ public class Stock {
 	this.stockCategory = stockCategory;
     }
 
-    public List<StockSheet> getEpsSheetList() {
-	return epsSheetList;
+    public List<StockSheet> getStockSheetList() {
+	return stockSheetList;
     }
 
-    public void setEpsSheetList(List<StockSheet> epsSheetList) {
-	this.epsSheetList = epsSheetList;
+    public void setStockSheetList(List<StockSheet> stockSheetList) {
+	this.stockSheetList = stockSheetList;
     }
-    
-    
-    
+
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+	return ToStringBuilder.reflectionToString(this);
     }
 }

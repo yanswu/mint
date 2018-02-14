@@ -8,8 +8,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 
-import org.hibernate.Criteria;
-
 public abstract class AbstractDao<PK extends Serializable, T> {
 
     private Class<T> entityClass;
@@ -22,12 +20,18 @@ public abstract class AbstractDao<PK extends Serializable, T> {
 	this.entityClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
 
-    protected EntityManager getEntityManager() {
+    public EntityManager getEntityManager() {
 	return this.entityManager;
     }
 
     public T getByKey(PK key) {
 	return (T) entityManager.find(entityClass, key);
+    }
+    
+    public CriteriaBuilder getCriteriaBuilder() {
+	
+	CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+	return cb;
     }
 
     public void persistList(List<T> entityList) {
