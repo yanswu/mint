@@ -7,22 +7,23 @@ import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import idv.mint.context.config.AppConfig;
 import idv.mint.context.config.JpaConfig;
-import idv.mint.context.config.WebMvcConfig;
+import idv.mint.context.config.WebConfig;
 import idv.mint.context.enums.EncodingType;
 
-public class WebXmlConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+public class WebXmlDispatcherServlet extends AbstractAnnotationConfigDispatcherServletInitializer {
     
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
     
     @Override
     protected Class<?>[] getRootConfigClasses() {
-	return new Class[] { JpaConfig.class };
+	return new Class[] { AppConfig.class, JpaConfig.class };
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-	return new Class[] { WebMvcConfig.class };
+	return new Class[] { WebConfig.class };
     }
 
     @Override
