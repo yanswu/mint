@@ -47,6 +47,7 @@ public interface Crawler {
     /**
      * <pre>
      *  marketType (市場分類)
+     *  pattern : marketType(1,2), sequence, categoryName,stockCode,stockName
      * </pre>
      * @param marketType
      * @return

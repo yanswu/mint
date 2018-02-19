@@ -7,4 +7,6 @@ import idv.mint.bean.StockSheet;
 public interface StockSheetService {
     
     public void saveStockSheetEntities(List<StockSheet> stockSheetList);
+    
+//    public List<E>
 }
