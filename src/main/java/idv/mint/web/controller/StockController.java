@@ -25,6 +25,8 @@ public class StockController {
     @RequestMapping(value = { "/{stockCode}" }, method = RequestMethod.GET)
     public ResponseEntity<Stock> getStock(@PathVariable String stockCode) {
 	
+	logger.debug("stockCode is["+stockCode+"]");
+	
 	Stock stock = stockService.getStock(stockCode);
 	return new ResponseEntity<Stock>(stock,HttpStatus.OK);
     }
