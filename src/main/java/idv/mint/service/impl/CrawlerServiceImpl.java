@@ -71,6 +71,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 	Crawler crawler = getCrawler(crawlType);
 
 	List<String> lines = crawler.getStockLines(marketType);
+	
 	stockList = StockCreator.createStockList(lines);
 
 	return stockList;
@@ -86,7 +87,9 @@ public class CrawlerServiceImpl implements CrawlerService {
     public List<StockSheet> getStockSheetList(CrawlType crawlType, String stockCode) throws IOException {
 
 	Crawler crawler = getCrawler(crawlType);
+	
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
+	
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
 	return StockCreator.createStockSheetEpsList(epsLines, dividendLines);
