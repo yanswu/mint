@@ -12,7 +12,7 @@ public class StockSheetDao extends AbstractDao<StockSheetPk, StockSheetEntity> {
     
     public List<StockSheetEntity> findByStockId(String stockId){
 	
-	String jpql = "select c from StockSheetEntity as c where c.sheetPk.stockId = : stockId";
+	String jpql = "select c from StockSheetEntity as c where c.sheetPk.stockId = :stockId";
 	
 	return this.getEntityManager().createQuery(jpql,StockSheetEntity.class).setParameter("stockId", stockId).getResultList();
 	
