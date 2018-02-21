@@ -12,7 +12,7 @@ import idv.mint.service.CrawlerService;
 import idv.mint.service.StockService;
 import idv.mint.type.CrawlType;
 
-public class StockDBWriterBatch extends AbstractRootBatch {
+public class StockDBWriterBatch extends AbstractInitialBatch {
 
     @Override
     public BatchStatusType process() throws Exception {

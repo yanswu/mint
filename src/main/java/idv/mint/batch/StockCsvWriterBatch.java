@@ -19,7 +19,7 @@ import idv.mint.util.FileUtils;
 import idv.mint.util.crawl.Crawler;
 import idv.mint.util.stock.StockCreator;
 
-public class StockCsvWriterBatch extends AbstractRootBatch {
+public class StockCsvWriterBatch extends AbstractInitialBatch {
 
     @Override
     public BatchStatusType process() throws Exception {

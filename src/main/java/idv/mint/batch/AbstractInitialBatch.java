@@ -13,9 +13,9 @@ import idv.mint.batch.type.BatchStatusType;
 import idv.mint.context.config.AppConfig;
 import idv.mint.context.config.JpaConfig;
 
-public abstract class AbstractRootBatch {
+public abstract class AbstractInitialBatch {
     
-    protected static final Logger logger = LogManager.getLogger(AbstractRootBatch.class);
+    protected static final Logger logger = LogManager.getLogger(AbstractInitialBatch.class);
 
     private AnnotationConfigApplicationContext context = null;
     
@@ -28,12 +28,14 @@ public abstract class AbstractRootBatch {
     private BatchStatusType statusType;
     
     private void initializedSpringConfig() {
+	
 	context = new AnnotationConfigApplicationContext();
 	context.register(AppConfig.class, JpaConfig.class);
 	context.refresh();
     }
 
     protected <T> T getSpringBean(Class<T> clazz) {
+	
 	return context.getBean(clazz);
     }
 
@@ -55,7 +57,6 @@ public abstract class AbstractRootBatch {
 	
 	taskEndTime = LocalDateTime.now();
 	
-	
 	logger.info("Task startTime ["+this.getStartTime()+"], endTime ["+this.getEndTime()+"]");
 	logger.info("it spends "+this.getBatchProcessSeconds()+" seconds");
 	logger.info("the Task BatchStatus is "+ getBatchStatusType());
@@ -64,10 +65,12 @@ public abstract class AbstractRootBatch {
     }
 
     protected String getStartTime() {
+	
 	return taskStartTime != null ? taskStartTime.format(formatter) : StringUtils.EMPTY;
     }
 
     protected String getEndTime() {
+	
 	return taskEndTime != null ? taskEndTime.format(formatter) : StringUtils.EMPTY;
     }
 
@@ -79,10 +82,12 @@ public abstract class AbstractRootBatch {
 	    Duration duration = Duration.between(taskStartTime, taskEndTime);
 	    seconds = duration.getSeconds();
 	}
+	
 	return seconds;
     }
 
     public BatchStatusType getBatchStatusType() {
+	
         return statusType;
     }
 
