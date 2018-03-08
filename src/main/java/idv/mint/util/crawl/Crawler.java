@@ -57,6 +57,9 @@ public interface Crawler {
     
     
     /**
+     * <pre>
+     * pattern : stockCode, pageStockCode, year, q1, q2, q3, q4
+     * </pre>
      * 取得歷年度EPS
      * @param stockCode
      * @return
@@ -65,6 +68,9 @@ public interface Crawler {
     public List<String> getStockEPSLines(String stockCode) throws IOException ;
     
     /**
+     * <pre>
+     * pattern : stockCode, rocYear, cashDividend, stockDividend
+     * </pre>
      * 取得歷年度股利(股票股利 現金股利)
      * 
      * @param stockCode

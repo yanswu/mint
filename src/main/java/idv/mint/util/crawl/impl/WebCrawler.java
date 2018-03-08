@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
@@ -92,7 +93,7 @@ public class WebCrawler implements Crawler {
 	    String[] sections = StringUtils.split(categoryLine, comma);
 	    String categoryName = sections[2];
 	    // pattern : stockCode,stockName
-	    List<String> lines = getStock(marketType, categoryName, RETRY_TIMES);
+	    List<String> lines = getStockLines(marketType, categoryName, RETRY_TIMES);
 	    for (String line : lines) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(categoryLine).append(comma).append(line);
@@ -105,10 +106,10 @@ public class WebCrawler implements Crawler {
     @Override
     public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
 	// crate pattern : stockCode,stockName
-	return getStock(marketType, categoryName, RETRY_TIMES);
+	return getStockLines(marketType, categoryName, RETRY_TIMES);
     }
 
-    public List<String> getStock(StockMarketType marketType, String categoryName, int reTryTimes) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType, String categoryName, int reTryTimes) throws IOException {
 
 	String urlTemplate = "https://tw.stock.yahoo.com/s/list.php?c=%s";
 	String prefix = marketType.isOTC() ? "櫃" : "";
@@ -141,7 +142,7 @@ public class WebCrawler implements Crawler {
 		} catch (InterruptedException e1) {
 		    e1.printStackTrace();
 		}
-		return getStock(marketType, categoryName, reTryTimes - 1);
+		return getStockLines(marketType, categoryName, reTryTimes - 1);
 	    }
 	}
 
@@ -160,31 +161,31 @@ public class WebCrawler implements Crawler {
     @Override
     public List<String> getStockEPSLines(String stockCode) throws IOException {
 
-	return this.getStockEPS(stockCode, RETRY_TIMES);
-
+	return this.getStockEPSLines(stockCode, RETRY_TIMES);
     }
 
-    public List<String> getStockEPS(String stockCode, int reTryTimes) throws IOException {
+    public List<String> getStockEPSLines(String stockCode, int reTryTimes) throws IOException {
 
 	String urlTemplate = "http://histock.tw/stock/financial.aspx?no=%s&st=2";
 	String url = String.format(urlTemplate, stockCode);
 
 	try {
-
 	    Document document = JsoupUtils.getDocument(url);
 	    Elements trList = document.select(".tb-stock.text-center tr");
 
-	    if (trList != null && trList.size() > 0) {
+//	    logger.debug(trList.toString());
+	    
+	    if (CollectionUtils.isNotEmpty(trList)) {
 
-		Element stockInfoTR = trList.get(0);
-		List<Element> yearTHList = trList.get(1).select("th").subList(1, trList.get(1).select("th").size());
-		List<Element> q1TRList = trList.get(2).select("td");
-		List<Element> q2TRList = trList.get(3).select("td");
-		List<Element> q3TRList = trList.get(4).select("td");
-		List<Element> q4TRList = trList.get(5).select("td");
-
+		List<Element> yearTHList = trList.get(0).select("th").subList(1, trList.get(0).select("th").size());
+		List<Element> q1TDList = trList.get(1).select("td");
+		List<Element> q2TDList = trList.get(2).select("td");
+		List<Element> q3TDList = trList.get(3).select("td");
+		List<Element> q4TDList = trList.get(4).select("td");
+		
 		// validate if the parameter of stockCode is the parser html stockCode
-		String pageStockCode = getHtmlStockCode(stockInfoTR);
+		String pageStockCode = getHtmlStockCode(document.select("div.info-left.w160 > div ").get(0));
+//		logger.debug("pageStockCode["+pageStockCode+"]");
 
 		AtomicInteger count = new AtomicInteger();
 
@@ -195,10 +196,10 @@ public class WebCrawler implements Crawler {
 		    int index = count.incrementAndGet() - 1;// start from 1
 		    String year = th.text();
 		    if (StringUtils.isNotBlank(year) && NumberUtils.isNumber(year)) {
-			String q1 = q1TRList.get(index).text();
-			String q2 = q2TRList.get(index).text();
-			String q3 = q3TRList.get(index).text();
-			String q4 = q4TRList.get(index).text();
+			String q1 = q1TDList.get(index).text();
+			String q2 = q2TDList.get(index).text();
+			String q3 = q3TDList.get(index).text();
+			String q4 = q4TDList.get(index).text();
 			String line = String.join(",", stockCode, pageStockCode, year, q1, q2, q3, q4);
 			lines.add(line);
 		    }
@@ -216,7 +217,7 @@ public class WebCrawler implements Crawler {
 		} catch (InterruptedException e1) {
 		    e1.printStackTrace();
 		}
-		return getStockEPS(stockCode, reTryTimes - 1);
+		return getStockEPSLines(stockCode, reTryTimes - 1);
 	    }
 	}
 
@@ -232,10 +233,10 @@ public class WebCrawler implements Crawler {
     @Override
     public List<String> getStockDividendLines(String stockCode) throws IOException {
 
-	return this.getStockDividend(stockCode, RETRY_TIMES);
+	return this.getStockDividendLines(stockCode, RETRY_TIMES);
     }
 
-    public List<String> getStockDividend(String stockCode, int reTryTimes) throws IOException {
+    public List<String> getStockDividendLines(String stockCode, int reTryTimes) throws IOException {
 
 	String urlTemplate = "https://tw.stock.yahoo.com/d/s/dividend_%s.html";
 	String url = String.format(urlTemplate, stockCode.substring(0, 4));
@@ -266,7 +267,7 @@ public class WebCrawler implements Crawler {
 		} catch (InterruptedException e1) {
 		    e1.printStackTrace();
 		}
-		return getStockDividend(stockCode, reTryTimes - 1);
+		return getStockDividendLines(stockCode, reTryTimes - 1);
 	    }
 	}
 
@@ -298,18 +299,19 @@ public class WebCrawler implements Crawler {
 	return stockName;
     }
 
-    private String getStockNameByHiStock(String stockCode) throws IOException {
+    public String getStockNameByHiStock(String stockCode) throws IOException {
 
 	String urlTemplate = "https://histock.tw/stock/%s";
 	String url = String.format(urlTemplate, stockCode);
 	Document document = JsoupUtils.getDocument(url);
-	Elements link = document.select("div.index-data.clearfix h3 a");
-	return link.text();
+//	logger.debug(document.toString());
+	Elements h3 = document.select("div.info-left.w600 > div h3 ");
+	return h3.text();
     }
 
     private String getHtmlStockCode(Element tr) {
 
-	String text = tr.select("td").text();
+	String text = tr.select("span").text();
 	int start = StringUtils.indexOf(text, "(");
 	int end = StringUtils.indexOf(text, ")");
 	String pageStockCode = StringUtils.substring(text, start + 1, end);
