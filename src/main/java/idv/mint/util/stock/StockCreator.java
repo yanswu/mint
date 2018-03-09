@@ -2,7 +2,9 @@ package idv.mint.util.stock;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -85,29 +87,45 @@ public class StockCreator {
 	return list;
     }
 
+    public static StockSheet createStockSheetEpsList(String stockEpsLine) {
+
+	List<String> stockCodeEpsLines = new ArrayList<>();
+	stockCodeEpsLines.add(stockEpsLine);
+	return createStockSheetEpsList(stockCodeEpsLines, null).get(0);
+    }
+
+    public static StockSheet createStockSheetDividendList(String stockDividendLine) {
+	
+	List<String> stockDividendLines = new ArrayList<>();
+	stockDividendLines.add(stockDividendLine);
+	return createStockSheetEpsList(null,stockDividendLines).get(0);
+    }
+
     /**
      * <pre>
      *  依 stockCode 為單位 取 對應的 epsLines,dividendLines
      * </pre>
      * 
-     * @param stockCodeEpsLines
+     * @param stockEPSLines
      * @param stockDividendLines
      * @return
      */
-    public static List<StockSheet> createStockSheetEpsList(List<String> stockCodeEpsLines, List<String> stockDividendLines) {
+    public static List<StockSheet> createStockSheetEpsList(List<String> stockEPSLines, List<String> stockDividendLines) {
 
 	List<StockSheet> list = new ArrayList<>();
+	
+	Map<Integer, StockSheet> epsMap = new LinkedHashMap<Integer, StockSheet>();
 
-	if (CollectionUtils.isNotEmpty(stockCodeEpsLines)) {
-	    
-	    // ,
-	    String comma = SymbolType.COMMA.getValue();
-	    // -
-	    String dash = SymbolType.DASH.getValue();
+	// ,
+	String comma = SymbolType.COMMA.getValue();
+	// -
+	String dash = SymbolType.DASH.getValue();
 
-	    for (String line : stockCodeEpsLines) {
-		String[] sections = StringUtils.split(line, comma);
+	if (CollectionUtils.isNotEmpty(stockEPSLines)) {
+
+	    for (String line : stockEPSLines) {
 		// stockCode, pageStockCode, year, q1, q2, q3, q4
+		String[] sections = StringUtils.split(line, comma);
 		String stockCode = sections[0];
 		String htmlParserStockCode = sections[1];
 
@@ -119,7 +137,7 @@ public class StockCreator {
 		    String epsQ3 = StringUtils.remove(sections[5], dash);
 		    String epsQ4 = StringUtils.remove(sections[6], dash);
 
-		    StockSheet stockSheet = new StockSheet(htmlParserStockCode, LocalDate.of(year, 1, 1));
+		    StockSheet stockSheet = new StockSheet(htmlParserStockCode, LocalDate.of(year, Month.JANUARY, 1));
 
 		    if (NumberUtils.isNumber(epsQ1)) {
 			stockSheet.setEpsQ1(new BigDecimal(epsQ1));
@@ -137,33 +155,43 @@ public class StockCreator {
 		}
 	    }
 
-	    Map<Integer, StockSheet> map = list.stream().collect(Collectors.toMap(c -> c.getBaseDate().getYear(), Function.identity()));
+	    epsMap = list.stream().collect(Collectors.toMap(c -> c.getBaseDate().getYear(), Function.identity()));
 
-	    // stock dividend
-	    if (CollectionUtils.isNotEmpty(stockDividendLines)) {
+	}
 
-		stockDividendLines.forEach(line -> {
-
-		    String[] sections = StringUtils.split(line, comma);
-		    String stockCode = sections[0];
-		    String rocYear = sections[1];
-		    String cashDividend = sections[2];
-		    String stockDividend = sections[3];
-		    // 1.先轉換成西元年
-		    // 2.yahoo 依 所屬年度 , +1 為 發放年度
-		    Integer y2kYear = Integer.parseInt(rocYear) + 1911 + 1;
-		    StockSheet stockSheet = map.get(y2kYear);
-		    if (stockSheet != null && StringUtils.equals(stockSheet.getStockCode(), stockCode)) {
-			if (StringUtils.isNotBlank(cashDividend) && NumberUtils.isNumber(cashDividend)) {
-			    stockSheet.setCashDividend(new BigDecimal(cashDividend));
-			}
-			if (StringUtils.isNotBlank(stockDividend) && NumberUtils.isNumber(stockDividend)) {
-			    stockSheet.setStockDividend(new BigDecimal(stockDividend));
-			}
+	// stock dividend
+	if (CollectionUtils.isNotEmpty(stockDividendLines)) {
+	    
+	    for(String line : stockDividendLines) {
+		
+		String[] sections = StringUtils.split(line, comma);
+		String stockCode = sections[0];
+		String rocYear = sections[1];
+		String cashDividend = sections[2];
+		String stockDividend = sections[3];
+		
+		// 1.先轉換成西元年
+		// 2.yahoo 依 所屬年度 , +1 為 發放年度
+		Integer y2kYear = Integer.parseInt(rocYear) + 1911 + 1;
+		StockSheet stockSheet = epsMap.get(y2kYear);
+		
+		if(stockSheet == null) {
+		    // 代表 沒有對應的 該年度　EPS
+		    stockSheet = new StockSheet(stockCode,LocalDate.of(y2kYear, Month.JANUARY, 1));
+		    list.add(stockSheet);
+		}
+		
+		if (stockSheet != null && StringUtils.equals(stockSheet.getStockCode(), stockCode)) {
+		    if (StringUtils.isNotBlank(cashDividend) && NumberUtils.isNumber(cashDividend)) {
+			stockSheet.setCashDividend(new BigDecimal(cashDividend));
 		    }
-		});
+		    if (StringUtils.isNotBlank(stockDividend) && NumberUtils.isNumber(stockDividend)) {
+			stockSheet.setStockDividend(new BigDecimal(stockDividend));
+		    }
+		}
 	    }
 	}
+
 	return list;
     }
 }
