@@ -25,7 +25,6 @@ import idv.mint.entity.StockSheetEntity;
 import idv.mint.entity.StockSheetPk;
 import idv.mint.entity.enums.OverseasType;
 import idv.mint.entity.enums.StockMarketType;
-import idv.mint.service.CrawlerService;
 import idv.mint.service.StockService;
 import idv.mint.util.crawl.Crawler;
 import idv.mint.util.stock.StockCreator;
@@ -35,9 +34,6 @@ public class StockServiceImpl implements StockService {
     
     private static final Logger logger = LogManager.getLogger(StockServiceImpl.class);
 
-    @Autowired
-    private CrawlerService crawlerService;
-    
     @Autowired
     private StockDao stockDao;
 
