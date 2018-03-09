@@ -1,5 +1,6 @@
 package idv.mint.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import idv.mint.bean.Stock;
@@ -13,6 +14,10 @@ public interface StockService {
     public void saveStockSheetEntities(List<StockSheet> stockSheetList);
     
     public void saveStockCategoryEntities(List<StockCategory> list);
+    
+    public void updateLastestEPS(String stockCode) throws IOException;
+
+    public void updateLastestDividend(String stockCode) throws IOException;
     
     public Stock getStock(String stockCode);
 

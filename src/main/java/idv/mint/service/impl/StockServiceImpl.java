@@ -1,5 +1,6 @@
 package idv.mint.service.impl;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +25,19 @@ import idv.mint.entity.StockSheetEntity;
 import idv.mint.entity.StockSheetPk;
 import idv.mint.entity.enums.OverseasType;
 import idv.mint.entity.enums.StockMarketType;
+import idv.mint.service.CrawlerService;
 import idv.mint.service.StockService;
+import idv.mint.util.crawl.Crawler;
+import idv.mint.util.stock.StockCreator;
 
 @Service("stockService")
 public class StockServiceImpl implements StockService {
     
     private static final Logger logger = LogManager.getLogger(StockServiceImpl.class);
 
+    @Autowired
+    private CrawlerService crawlerService;
+    
     @Autowired
     private StockDao stockDao;
 
@@ -164,6 +171,46 @@ public class StockServiceImpl implements StockService {
 	    }
 	}
 	return null;
+    }
+
+    @Transactional
+    @Override
+    public void updateLastestEPS(String stockCode) throws IOException {
+	
+	Crawler crawler = Crawler.createWebCrawler();
+	List<String> epsLines = crawler.getStockEPSLines(stockCode);
+	String lastLine = epsLines.get(epsLines.size() -1);
+	
+	StockSheet stockSheet = StockCreator.createStockSheetEps(lastLine);
+	
+	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(),stockSheet.getBaseDate());
+	
+	if(entity == null) {
+	    stockSheetDao.persist(entity);
+	}else {
+	    stockSheetDao.updateLastestEPS(stockSheet);	    
+	}
+    }
+
+    @Transactional
+    @Override
+    public void updateLastestDividend(String stockCode) throws IOException {
+	
+	Crawler crawler = Crawler.createWebCrawler();
+	
+	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
+	
+	String lastLine = dividendLines.get(dividendLines.size() -1);
+	
+	StockSheet stockSheet = StockCreator.createStockSheetDividend(lastLine);
+	
+	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(),stockSheet.getBaseDate());
+	
+	if(entity == null) {
+	    stockSheetDao.persist(entity);
+	}else {
+	    stockSheetDao.updateLastestDividend(stockSheet);	    
+	}
     }
 
 }

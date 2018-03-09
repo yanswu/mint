@@ -87,14 +87,14 @@ public class StockCreator {
 	return list;
     }
 
-    public static StockSheet createStockSheetEpsList(String stockEpsLine) {
+    public static StockSheet createStockSheetEps(String stockEpsLine) {
 
 	List<String> stockCodeEpsLines = new ArrayList<>();
 	stockCodeEpsLines.add(stockEpsLine);
 	return createStockSheetEpsList(stockCodeEpsLines, null).get(0);
     }
 
-    public static StockSheet createStockSheetDividendList(String stockDividendLine) {
+    public static StockSheet createStockSheetDividend(String stockDividendLine) {
 	
 	List<String> stockDividendLines = new ArrayList<>();
 	stockDividendLines.add(stockDividendLine);

@@ -40,8 +40,8 @@ public class StockCreatorTest {
     }
 
     @Test
-    public void testCreateStockSheetEpsList() throws Exception {
-	throw new RuntimeException("not yet implemented");
-    }
+        public void testCreateStockSheetEps() throws Exception {
+    	throw new RuntimeException("not yet implemented");
+        }
 
 }
