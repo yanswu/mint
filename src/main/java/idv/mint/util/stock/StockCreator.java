@@ -91,14 +91,14 @@ public class StockCreator {
 
 	List<String> stockCodeEpsLines = new ArrayList<>();
 	stockCodeEpsLines.add(stockEpsLine);
-	return createStockSheetEpsList(stockCodeEpsLines, null).get(0);
+	return createStockSheetList(stockCodeEpsLines, null).get(0);
     }
 
     public static StockSheet createStockSheetDividend(String stockDividendLine) {
 	
 	List<String> stockDividendLines = new ArrayList<>();
 	stockDividendLines.add(stockDividendLine);
-	return createStockSheetEpsList(null,stockDividendLines).get(0);
+	return createStockSheetList(null,stockDividendLines).get(0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class StockCreator {
      * @param stockDividendLines
      * @return
      */
-    public static List<StockSheet> createStockSheetEpsList(List<String> stockEPSLines, List<String> stockDividendLines) {
+    public static List<StockSheet> createStockSheetList(List<String> stockEPSLines, List<String> stockDividendLines) {
 
 	List<StockSheet> list = new ArrayList<>();
 	
@@ -171,8 +171,8 @@ public class StockCreator {
 		String stockDividend = sections[3];
 		
 		// 1.先轉換成西元年
-		// 2.yahoo 依 所屬年度 , +1 為 發放年度
-		Integer y2kYear = Integer.parseInt(rocYear) + 1911 + 1;
+		// 2.yahoo 依 所屬年度 
+		Integer y2kYear = Integer.parseInt(rocYear) + 1911 ;
 		StockSheet stockSheet = epsMap.get(y2kYear);
 		
 		if(stockSheet == null) {

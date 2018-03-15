@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
 import idv.mint.bean.StockSheet;
+import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.service.CrawlerService;
 import idv.mint.support.PathSettings;
@@ -92,7 +93,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 	
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
-	return StockCreator.createStockSheetEpsList(epsLines, dividendLines);
+	return StockCreator.createStockSheetList(epsLines, dividendLines);
     }
 
     /**
@@ -131,10 +132,10 @@ public class CrawlerServiceImpl implements CrawlerService {
 	    Map<String, List<String>> stockDividendMap = new LinkedHashMap<>();
 
 	    List<String> epsLines = Files.readAllLines(epsPath);
-
+	    
 	    for (String line : epsLines) {
-
-		String stockCode = StringUtils.split(line)[0];
+		
+		String stockCode = StringUtils.split(line,SymbolType.COMMA.getValue())[0];
 
 		if (!stockEpsMap.containsKey(stockCode)) {
 		    stockEpsMap.put(stockCode, new ArrayList<>());
@@ -142,11 +143,12 @@ public class CrawlerServiceImpl implements CrawlerService {
 		stockEpsMap.get(stockCode).add(line);
 	    }
 
+
 	    List<String> dividendLines = Files.readAllLines(dividendPath);
 
 	    for (String line : dividendLines) {
 
-		String stockCode = StringUtils.split(line)[0];
+		String stockCode = StringUtils.split(line,SymbolType.COMMA.getValue())[0];
 
 		if (!stockDividendMap.containsKey(stockCode)) {
 		    stockDividendMap.put(stockCode, new ArrayList<>());
@@ -159,7 +161,8 @@ public class CrawlerServiceImpl implements CrawlerService {
 	    for (String stockCode : stockEpsMap.keySet()) {
 		List<String> epsLineList = stockEpsMap.get(stockCode);
 		List<String> dividendLineList = stockDividendMap.get(stockCode);
-		stockSheetList.addAll(StockCreator.createStockSheetEpsList(epsLineList, dividendLineList));
+		
+		stockSheetList.addAll(StockCreator.createStockSheetList(epsLineList, dividendLineList));
 	    }
 	    return stockSheetList;
 	}
