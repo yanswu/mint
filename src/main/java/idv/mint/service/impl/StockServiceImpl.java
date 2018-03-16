@@ -2,6 +2,7 @@ package idv.mint.service.impl;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +94,7 @@ public class StockServiceImpl implements StockService {
 		entity.setEpsQ4(stockSheet.getEpsQ4());
 		entity.setStockDividend(stockSheet.getStockDividend());
 		entity.setCashDividend(stockSheet.getCashDividend());
+		entity.setInsertTime(LocalDateTime.now());
 		stockSheetDao.persist(entity);
 	    });
 	}

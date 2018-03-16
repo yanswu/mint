@@ -1,6 +1,7 @@
 package idv.mint.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -33,6 +34,12 @@ public class StockSheetEntity {
 
     @Column(name = "STOCK_DIVIDEND")
     private BigDecimal stockDividend;
+
+    @Column(name = "INSERT_TIME")
+    private LocalDateTime insertTime;
+
+    @Column(name = "UPDATE_TIME")
+    private LocalDateTime updateTime;
 
     public StockSheetEntity() {
     }
@@ -91,6 +98,22 @@ public class StockSheetEntity {
 
     public void setStockDividend(BigDecimal stockDividend) {
 	this.stockDividend = stockDividend;
+    }
+
+    public LocalDateTime getInsertTime() {
+	return insertTime;
+    }
+
+    public void setInsertTime(LocalDateTime insertTime) {
+	this.insertTime = insertTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+	return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+	this.updateTime = updateTime;
     }
 
     @Override
