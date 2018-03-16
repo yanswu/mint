@@ -44,6 +44,7 @@ public class StockDBWriterBatch extends AbstractInitialBatch {
 	return BatchStatusType.SUCCESS;
     }
 
+    
     public static void main(String[] args) {
 
 	new StockDBWriterBatch().execute();

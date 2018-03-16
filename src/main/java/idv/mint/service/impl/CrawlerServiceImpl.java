@@ -164,10 +164,25 @@ public class CrawlerServiceImpl implements CrawlerService {
 		
 		stockSheetList.addAll(StockCreator.createStockSheetList(epsLineList, dividendLineList));
 	    }
+	    
+	    // filter 
+	    stockSheetList = filterEmptyEPSStockSheet(stockSheetList);
 	    return stockSheetList;
 	}
 
 	return new ArrayList<>();
+    }
+    
+    /**
+     * 排除舊資料
+     * @param stockSheetList
+     * @return
+     */
+    private List<StockSheet> filterEmptyEPSStockSheet(List<StockSheet> stockSheetList) {
+	
+	return stockSheetList.stream().filter(e->{
+	    return e.getEpsQ1() != null;
+	}).collect(Collectors.toList());
     }
 
 }
