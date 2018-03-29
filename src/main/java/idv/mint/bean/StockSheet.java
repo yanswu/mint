@@ -23,10 +23,12 @@ public class StockSheet {
 
     private BigDecimal stockDividend;
 
+    private BigDecimal totalEps;
+
     public StockSheet() {
     }
 
-    public StockSheet(String stockCode,LocalDate baseDate) {
+    public StockSheet(String stockCode, LocalDate baseDate) {
 	this.stockCode = stockCode;
 	this.baseDate = baseDate;
     }
@@ -77,6 +79,14 @@ public class StockSheet {
 
     public void setEpsQ4(BigDecimal epsQ4) {
 	this.epsQ4 = epsQ4;
+    }
+
+    public BigDecimal getTotalEps() {
+	return totalEps;
+    }
+
+    public void setTotalEps(BigDecimal totalEps) {
+	this.totalEps = totalEps;
     }
 
     public BigDecimal getCashDividend() {
