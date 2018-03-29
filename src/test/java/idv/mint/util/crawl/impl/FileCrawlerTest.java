@@ -40,7 +40,7 @@ public class FileCrawlerTest {
 	String stockCode = "1773";
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
-	List<StockSheet> stockSheetList = StockCreator.createStockSheetEpsList(epsLines, dividendLines);
+	List<StockSheet> stockSheetList = StockCreator.createStockSheetList(epsLines, dividendLines);
 
 	stockSheetList.stream().forEach(sheet -> {
 	    int year = sheet.getBaseDate().getYear();
@@ -72,7 +72,7 @@ public class FileCrawlerTest {
 	String stockCode = "6261";
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
-	List<StockSheet> stockSheetList = StockCreator.createStockSheetEpsList(epsLines, dividendLines);
+	List<StockSheet> stockSheetList = StockCreator.createStockSheetList(epsLines, dividendLines);
 
 	stockSheetList.stream().forEach(sheet -> {
 	    int year = sheet.getBaseDate().getYear();

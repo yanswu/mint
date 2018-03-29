@@ -1,11 +1,14 @@
 package idv.mint.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -66,10 +69,10 @@ public class StockServiceImpl implements StockService {
 	    });
 	}
     }
-    
+
     @Transactional
     public void saveStockSheet(StockSheet stockSheet) {
-	
+
 	this.saveStockSheetEntities(Arrays.asList(stockSheet));
     }
 
@@ -171,10 +174,19 @@ public class StockServiceImpl implements StockService {
 
 		StockSheet stockSheet = new StockSheet();
 		stockSheet.setBaseDate(entity.getSheetPk().getCalYear());
-		stockSheet.setEpsQ1(entity.getEpsQ1());
-		stockSheet.setEpsQ2(entity.getEpsQ2());
-		stockSheet.setEpsQ3(entity.getEpsQ3());
-		stockSheet.setEpsQ4(entity.getEpsQ4());
+
+		BigDecimal epsQ1 = entity.getEpsQ1();
+		BigDecimal epsQ2 = entity.getEpsQ2();
+		BigDecimal epsQ3 = entity.getEpsQ3();
+		BigDecimal epsQ4 = entity.getEpsQ4();
+		BigDecimal totalEps = Arrays.asList(epsQ1,epsQ2,epsQ3,epsQ4).stream().filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		stockSheet.setEpsQ1(epsQ1);
+		stockSheet.setEpsQ2(epsQ2);
+		stockSheet.setEpsQ3(epsQ3);
+		stockSheet.setEpsQ4(epsQ4);
+		stockSheet.setTotalEps(totalEps);
+		
 		stockSheet.setCashDividend(entity.getCashDividend());
 		stockSheet.setStockDividend(entity.getStockDividend());
 		return stockSheet;
@@ -217,9 +229,7 @@ public class StockServiceImpl implements StockService {
 	String lastLine = dividendLines.get(0);
 
 	StockSheet stockSheet = StockCreator.createStockSheetDividend(lastLine);
-	
-	logger.debug("stockSheet["+stockSheet+"]");
-	
+
 	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
 
 	if (entity == null) {
@@ -228,7 +238,5 @@ public class StockServiceImpl implements StockService {
 	    stockSheetDao.updateLastestDividend(stockSheet);
 	}
     }
-    
-    
 
 }

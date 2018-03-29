@@ -26,5 +26,7 @@ create table T_STOCK_SHEET (
         STOCK_DIVIDEND numeric(19, 2),
         NET_INCOME numeric(19, 2),
         ROE_RATE numeric(19, 2),
+        INSERT_TIME TIMESTAMP  DEFAULT now(),
+        UPDATE_TIME TIMESTAMP ,
         primary key (STOCK_ID,CAL_YEAR)
     );
