@@ -29,27 +29,7 @@
 		<script>
 			$(document).ready(function(){
 				
-				var arr =[];
-				
-				 
-				$.ajax({
-					url: "/mint/stock/" + 2330,
-					contentType: 'application/json',
-					type: "GET",
-					dataType: 'json',
-					async : false,
-					success: function (data) {
-						arr = data.stockSheetList;
-						arr.unshift({});
-						arr.unshift({});
-					},
-					error: function (e) {
-						console.log("ERROR: ", e);
-					},
-					done: function (e) {
-						console.log("DONE");
-					}
-				});
+				var arr =[{},{}];
 				//
 					var x1 = math.format(math.eval('1.2 + 1.56 + 2.38+0.01'), 12);
 					console.log(x1);
@@ -59,24 +39,24 @@
 					var hot1;
 
 					hot1 = new Handsontable(container1, {
-						data: arr,
-					  	startRows: 10,
-					  	startCols: 20,
+						//data: arr,
+					  	startRows: 12,
+					  	startCols: 12,
 					  	colHeaders: true,
 						rowHeaders: true,
-						//manualColumnResize : true,
+						colWidths:  70,
 						columns: [
 							{ data: "baseDate.year" },
-							{ data: "x" },
-							{ data: "x" },
-							{ data: "x" },
-							{ data: "x" },
-							{ data: "x" },
+							{ data: "baseDate.a" },
+							{ data: "baseDate.b" },
+							{ data: "baseDate.c" },
+							{ data: "baseDate.d" },
+							{ data: "baseDate.e" },
 							{ data: "totalEps" },
 							{ data: "cashDividend" },
 							{ data: "stockDividend" },
 						]  ,
-					  	//minSpareRows: 1,
+					  	minSpareRows: 1,
 					  
 					    afterChange: function(changes, source) {
 					    	if(!changes || source === 'loadData') {
@@ -89,32 +69,33 @@
 						       var newVal = element[3];
 						       
 						       console.log("row["+row+"],col["+col+"],oldVal["+oldVal+"],newVal["+newVal+"],countCols["+hot1.countCols()+"],countRows["+hot1.countRows()+"]");
-						       if(col+1<hot1.countCols()) {
-						       		//data[row][col+1]=parseInt(data[row][col+1])+parseInt(newVal);
-						         	hot1.loadData(arr);
-						       }
+						    //    if(col+1<hot1.countCols()) {
+								   if(row == 1 && col =='baseDate.year'){
+									   console.log('hello['+ newVal+"]");
+									   data = getStockSheetList(newVal);
+									   renderTable(hot1,data);
+								   }
+						    //    }
 				      		});
+						},
+						cells: function (row, col, prop) {
+							var cellProperties = {};
+							if (row === 1 && col === 0) {
+								cellProperties.renderer = stockCodeRenderer; 
+							}
+							return cellProperties;
 						}	  
-						});
+					});
 					
-					 hot1.setDataAtCell(1, 1, "還原$");
-					 hot1.setDataAtCell(1, 2, "ROE%");
-					 hot1.setDataAtCell(1, 3, "4盈再%");
-					 hot1.setDataAtCell(1, 4, "常利$m");
-					 hot1.setDataAtCell(1, 5, "配息%");
-					 hot1.setDataAtCell(1, 6, "常EPS$");
-					 hot1.setDataAtCell(1, 7, "股息$");
-					 hot1.setDataAtCell(1, 8, "股子");
+					renderTable(hot1,arr);
 					// var cell = hot1.getDataAtCell(3,2);
 					// console.log("cell"+cell);
 					// var arr = hot1.getDataAtCol(1);
 					// console.log("arr"+arr);
 					
-					//hot1.alter('insert_row', 13);
-					//hot1.alter('insert_col', 22);
-					
 					var stockCode = $('#stockCode').val();
 					$('#epsBtn').click(function(){
+						
 						$.ajax({
 							url: "/mint/stock/lastestEps/"+stockCode,
 							contentType: 'application/json',
@@ -122,7 +103,6 @@
 							dataType: 'json',
 							success: function (data) {
 
-								//$("#tabulator-example").tabulator("setData", data);
 							},
 							error: function (e) {
 								console.log("ERROR: ", e);
@@ -140,7 +120,6 @@
 						type: "PUT",
 						dataType: 'json',
 						success: function (data) {
-							//$("#tabulator-example").tabulator("setData", data);
 						},
 						error: function (e) {
 							console.log("ERROR: ", e);
@@ -152,6 +131,7 @@
 				});
 					
 			});
+
 		</script>
 	</head>
 
@@ -160,11 +140,9 @@
 			
 				<div id="example1"/>
 				
-			<hr noshade="noshade" style="border:1px #cccccc dotted;" size="2" />
+				<hr noshade="noshade" style="border:1px #cccccc dotted;" size="2" />
 			
-			<div id="example"/>
-			
-			<div id="tabulator-example"/>
+				<div id="example"/>
 			
 			</div>
 

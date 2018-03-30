@@ -12,4 +12,6 @@
 	type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.0.0/math.min.js" 
 	type="text/javascript"></script>
+<script src='<c:url value="/resources/js/app.js"/>' 
+	type="text/javascript"></script>
 	
