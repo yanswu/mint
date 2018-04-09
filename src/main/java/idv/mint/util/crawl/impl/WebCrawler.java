@@ -184,7 +184,10 @@ public class WebCrawler implements Crawler {
 		List<Element> q4TDList = trList.get(4).select("td");
 		
 		// validate if the parameter of stockCode is the parser html stockCode
-		String pageStockCode = getHtmlStockCode(document.select("div.info-left.w160 > div ").get(0));
+//		Elements elements = document.select("div.info-left.w160 > div ");
+		Elements elements = document.select("div.info-left.w200 > div ");
+		
+		String pageStockCode = getHtmlStockCode(elements.get(0));		    
 //		logger.debug("pageStockCode["+pageStockCode+"]");
 
 		AtomicInteger count = new AtomicInteger();
