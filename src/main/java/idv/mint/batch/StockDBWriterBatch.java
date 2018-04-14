@@ -3,7 +3,7 @@ package idv.mint.batch;
 import java.util.Arrays;
 import java.util.List;
 
-import idv.mint.batch.type.BatchStatusType;
+import idv.mint.batch.type.ProcessType;
 import idv.mint.bean.Stock;
 import idv.mint.bean.StockCategory;
 import idv.mint.bean.StockSheet;
@@ -12,10 +12,12 @@ import idv.mint.service.CrawlerService;
 import idv.mint.service.StockService;
 import idv.mint.type.CrawlType;
 
-public class StockDBWriterBatch extends AbstractInitialBatch {
-
+public class StockDBWriterBatch extends AbstractBatchExecutor{
+    
+    
+    
     @Override
-    public BatchStatusType process() throws Exception {
+    public ProcessType process() throws Exception {
 
 	CrawlerService crawlerService = this.getSpringBean(CrawlerService.class);
 	StockService stockService = this.getSpringBean(StockService.class);
@@ -41,7 +43,7 @@ public class StockDBWriterBatch extends AbstractInitialBatch {
 	    stockService.saveStockSheetEntities(stockSheetList);
 	}
 
-	return BatchStatusType.SUCCESS;
+	return ProcessType.SUCCESS;
     }
 
     

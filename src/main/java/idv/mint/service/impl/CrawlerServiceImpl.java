@@ -1,6 +1,7 @@
 package idv.mint.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ import idv.mint.service.CrawlerService;
 import idv.mint.support.PathSettings;
 import idv.mint.type.CrawlType;
 import idv.mint.util.crawl.Crawler;
-import idv.mint.util.stock.StockCreator;
+import idv.mint.util.stock.StockConverter;
 
 @Service("crawlerService")
 public class CrawlerServiceImpl implements CrawlerService {
@@ -43,7 +45,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
 	Crawler crawler = getCrawler(crawlType);
 	List<String> lines = crawler.getStockCategoryLines(marketType);
-	return StockCreator.createStockCategoryList(lines);
+	return StockConverter.convertStockCategoryList(lines);
     }
 
     /**
@@ -73,7 +75,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
 	List<String> lines = crawler.getStockLines(marketType);
 	
-	stockList = StockCreator.createStockList(lines);
+	stockList = StockConverter.convertStockList(lines);
 
 	return stockList;
     }
@@ -93,7 +95,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 	
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
-	return StockCreator.createStockSheetList(epsLines, dividendLines);
+	return StockConverter.createStockSheetList(epsLines, dividendLines);
     }
 
     /**
@@ -162,7 +164,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 		List<String> epsLineList = stockEpsMap.get(stockCode);
 		List<String> dividendLineList = stockDividendMap.get(stockCode);
 		
-		stockSheetList.addAll(StockCreator.createStockSheetList(epsLineList, dividendLineList));
+		stockSheetList.addAll(StockConverter.createStockSheetList(epsLineList, dividendLineList));
 	    }
 	    
 	    // filter 
@@ -183,6 +185,18 @@ public class CrawlerServiceImpl implements CrawlerService {
 	return stockSheetList.stream().filter(e->{
 	    return e.getEpsQ1() != null;
 	}).collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal getStockPrice(String stockCode) {
+	
+	Crawler crawler = Crawler.createWebCrawler();
+	String stockPrice = crawler.getStockPrice(stockCode);
+	
+	if(StringUtils.isNotBlank(stockPrice) && NumberUtils.isNumber(stockPrice)) {
+	    return new BigDecimal(stockPrice);
+	}
+	return BigDecimal.ZERO;
     }
 
 }

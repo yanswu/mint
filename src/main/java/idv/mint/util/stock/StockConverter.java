@@ -20,9 +20,9 @@ import idv.mint.bean.StockSheet;
 import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 
-public class StockCreator {
+public class StockConverter {
 
-    public static List<StockCategory> createStockCategoryList(List<String> lines) {
+    public static List<StockCategory> convertStockCategoryList(List<String> lines) {
 
 	List<StockCategory> list = new ArrayList<>();
 
@@ -49,8 +49,15 @@ public class StockCreator {
 	}
 	return list;
     }
-
-    public static List<Stock> createStockList(List<String> lines) {
+    
+    /**
+     * <pre>
+     * 	pattern : 1,14,半導體,2330,台積電
+     * </pre>
+     * @param lines
+     * @return
+     */
+    public static List<Stock> convertStockList(List<String> lines) {
 
 	List<Stock> list = new ArrayList<>();
 

@@ -159,6 +159,25 @@ public class WebCrawlerTest {
 	String stockCode = "4157"; 
 	String stockName = new WebCrawler().getStockNameByHiStock(stockCode);
 	assertEquals("太景*-KY", stockName);
-	
     }
+
+    @Test
+    public void testGetStockPrice() throws IOException{
+	
+	String stockCode = "1773";
+	Crawler crawler = Crawler.createWebCrawler();
+	String price = crawler.getStockPrice(stockCode);
+	assertNotNull(price);
+    }
+
+    @Test
+    public void testGetStockRoeNetIncomeLines() throws IOException{
+	
+	String stockCode = "1773";
+	Crawler crawler = Crawler.createWebCrawler();
+	crawler.getStockRoeNetIncomeLines(stockCode);
+	assertNotNull("");
+    }
+    
+    
 }

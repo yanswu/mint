@@ -25,6 +25,9 @@ public class StockSheet {
 
     private BigDecimal totalEps;
 
+    // 還原股價
+    private BigDecimal valuePrice;
+
     public StockSheet() {
     }
 
@@ -103,6 +106,14 @@ public class StockSheet {
 
     public void setStockDividend(BigDecimal stockDividend) {
 	this.stockDividend = stockDividend;
+    }
+
+    public BigDecimal getValuePrice() {
+	return valuePrice;
+    }
+
+    public void setValuePrice(BigDecimal valuePrice) {
+	this.valuePrice = valuePrice;
     }
 
     @Override

@@ -2,7 +2,7 @@ package idv.mint.batch.type;
 
 import java.util.Arrays;
 
-public enum BatchStatusType {
+public enum ProcessType {
     
     FAILED("F"),
     
@@ -14,7 +14,7 @@ public enum BatchStatusType {
     
     private String value ;
     
-    BatchStatusType(String value) {
+    ProcessType(String value) {
 	this.value = value;
     }
     
@@ -22,7 +22,7 @@ public enum BatchStatusType {
 	return value;
     }
     
-    public static BatchStatusType find(String val) {
+    public static ProcessType find(String val) {
 	
 	return Arrays.stream(values()).filter(e -> e.getValue().equals(val)).findFirst().orElse(UNKNOWN);
     }

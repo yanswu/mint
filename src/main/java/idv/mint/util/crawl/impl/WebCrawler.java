@@ -34,6 +34,23 @@ public class WebCrawler implements Crawler {
     public WebCrawler() {
     }
 
+    public String getStockPrice(String stockCode) {
+
+	String urlTemplate = "https://tw.finance.yahoo.com/q/q?s=%s";
+	String url = String.format(urlTemplate, stockCode);
+
+	String price = null;
+	try {
+	    Document document = JsoupUtils.getDocument(url);
+	    Element priceTD = document.select("table[width=750][border=2] tr td b").get(0);
+	    price = priceTD.text();
+	    logger.info(price);
+	} catch (Exception e) {
+	    logger.error(e.getMessage());
+	}
+	return price;
+    }
+
     /**
      * <pre>
      * 	 pattern :marketType(1,2), sequence, categoryName
@@ -90,10 +107,13 @@ public class WebCrawler implements Crawler {
 	List<String> stockLines = new ArrayList<>();
 
 	for (String categoryLine : stockCategoryLines) {
+
 	    String[] sections = StringUtils.split(categoryLine, comma);
 	    String categoryName = sections[2];
+
 	    // pattern : stockCode,stockName
 	    List<String> lines = getStockLines(marketType, categoryName, RETRY_TIMES);
+
 	    for (String line : lines) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(categoryLine).append(comma).append(line);
@@ -104,19 +124,21 @@ public class WebCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType, String categoryName) {
 	// crate pattern : stockCode,stockName
 	return getStockLines(marketType, categoryName, RETRY_TIMES);
     }
 
-    public List<String> getStockLines(StockMarketType marketType, String categoryName, int reTryTimes) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType, String categoryName, int reTryTimes) {
 
 	String urlTemplate = "https://tw.stock.yahoo.com/s/list.php?c=%s";
 	String prefix = marketType.isOTC() ? "櫃" : "";
-	String qCategoryName = URLEncoder.encode(prefix + categoryName, EncodingType.BIG5.getValue());
-	String url = String.format(urlTemplate, qCategoryName);
 
+	String url = null;
 	try {
+
+	    String qCategoryName = URLEncoder.encode(prefix + categoryName, EncodingType.BIG5.getValue());
+	    url = String.format(urlTemplate, qCategoryName);
 	    Document document = JsoupUtils.getDocument(url);
 	    Elements trList = document.select(" td table[bgcolor='#ffffff'] tr");
 
@@ -159,12 +181,12 @@ public class WebCrawler implements Crawler {
      * @throws IOException
      */
     @Override
-    public List<String> getStockEPSLines(String stockCode) throws IOException {
+    public List<String> getStockEPSLines(String stockCode) {
 
 	return this.getStockEPSLines(stockCode, RETRY_TIMES);
     }
 
-    public List<String> getStockEPSLines(String stockCode, int reTryTimes) throws IOException {
+    public List<String> getStockEPSLines(String stockCode, int reTryTimes) {
 
 	String urlTemplate = "http://histock.tw/stock/financial.aspx?no=%s&st=2";
 	String url = String.format(urlTemplate, stockCode);
@@ -173,8 +195,8 @@ public class WebCrawler implements Crawler {
 	    Document document = JsoupUtils.getDocument(url);
 	    Elements trList = document.select(".tb-stock.text-center tr");
 
-//	    logger.debug(trList.toString());
-	    
+	    // logger.debug(trList.toString());
+
 	    if (CollectionUtils.isNotEmpty(trList)) {
 
 		List<Element> yearTHList = trList.get(0).select("th").subList(1, trList.get(0).select("th").size());
@@ -182,13 +204,13 @@ public class WebCrawler implements Crawler {
 		List<Element> q2TDList = trList.get(2).select("td");
 		List<Element> q3TDList = trList.get(3).select("td");
 		List<Element> q4TDList = trList.get(4).select("td");
-		
+
 		// validate if the parameter of stockCode is the parser html stockCode
-//		Elements elements = document.select("div.info-left.w160 > div ");
+		// Elements elements = document.select("div.info-left.w160 > div ");
 		Elements elements = document.select("div.info-left.w200 > div ");
-		
-		String pageStockCode = getHtmlStockCode(elements.get(0));		    
-//		logger.debug("pageStockCode["+pageStockCode+"]");
+
+		String pageStockCode = getHtmlStockCode(elements.get(0));
+		// logger.debug("pageStockCode["+pageStockCode+"]");
 
 		AtomicInteger count = new AtomicInteger();
 
@@ -234,12 +256,12 @@ public class WebCrawler implements Crawler {
      * </pre>
      */
     @Override
-    public List<String> getStockDividendLines(String stockCode) throws IOException {
+    public List<String> getStockDividendLines(String stockCode) {
 
 	return this.getStockDividendLines(stockCode, RETRY_TIMES);
     }
 
-    public List<String> getStockDividendLines(String stockCode, int reTryTimes) throws IOException {
+    public List<String> getStockDividendLines(String stockCode, int reTryTimes) {
 
 	String urlTemplate = "https://tw.stock.yahoo.com/d/s/dividend_%s.html";
 	String url = String.format(urlTemplate, stockCode.substring(0, 4));
@@ -262,6 +284,7 @@ public class WebCrawler implements Crawler {
 
 	    }
 	} catch (Exception e) {
+
 	    logger.error(String.format("url [%s]", url), e);
 
 	    if (reTryTimes > 1) {
@@ -275,6 +298,69 @@ public class WebCrawler implements Crawler {
 	}
 
 	return new ArrayList<>();
+    }
+    
+    @Override
+    public List<String> getStockRoeNetIncomeLines(String stockCode) {
+
+	return getStockRoeNetIncomeLines(stockCode, RETRY_TIMES);
+
+    }
+
+    public List<String> getStockRoeNetIncomeLines(String stockCode, Integer reTryTimes) {
+	
+	// 年合併損益表
+//	String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcq/zcqa/zcqa_%s.djhtm";
+	
+	// 年合併資產負債表 
+//	String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcp/zcpb/zcpb_%s.djhtm";
+	
+//	String urlTemplate = "https://goodinfo.tw/StockInfo/StockFinDetail.asp?RPT_CAT=XX_YEAR&LAST_RPT_CAT=XX_YEAR&STOCK_ID=%s&QRY_TIME=2017";
+	
+	    
+	String urlTemplate = "https://goodinfo.tw/StockInfo/StockDetail.asp?STOCK_ID=1773";
+	
+	    
+	String url = String.format(urlTemplate, stockCode);
+
+	try {
+
+	    Document document = JsoupUtils.getDocument(url);
+//	    logger.debug(document.toString());
+	    Element element = document.select("table#FINANCE_INCOME_M  ").get(0);
+	    logger.debug(element.toString());
+
+	} catch (Exception e) {
+
+	    logger.error(String.format("url [%s]", url), e);
+
+	    if (reTryTimes > 1) {
+
+		try {
+
+		    Thread.sleep(new Random().nextInt(9) * 1000);
+
+		} catch (InterruptedException e1) {
+
+		    e1.printStackTrace();
+		}
+
+		return getStockRoeNetIncomeLines(stockCode, reTryTimes - 1);
+	    }
+
+	}
+
+	return new ArrayList<>();
+    }
+
+    public String getStockNameByHiStock(String stockCode) throws IOException {
+
+	String urlTemplate = "https://histock.tw/stock/%s";
+	String url = String.format(urlTemplate, stockCode);
+	Document document = JsoupUtils.getDocument(url);
+	// logger.debug(document.toString());
+	Elements h3 = document.select("div.info-left.w600 > div h3 ");
+	return h3.text();
     }
 
     /*
@@ -295,21 +381,10 @@ public class WebCrawler implements Crawler {
 		} catch (IOException e) {
 		    throw new RuntimeException(e);
 		}
-
 		return patchStockName;
 	    }
 	}
 	return stockName;
-    }
-
-    public String getStockNameByHiStock(String stockCode) throws IOException {
-
-	String urlTemplate = "https://histock.tw/stock/%s";
-	String url = String.format(urlTemplate, stockCode);
-	Document document = JsoupUtils.getDocument(url);
-//	logger.debug(document.toString());
-	Elements h3 = document.select("div.info-left.w600 > div h3 ");
-	return h3.text();
     }
 
     private String getHtmlStockCode(Element tr) {

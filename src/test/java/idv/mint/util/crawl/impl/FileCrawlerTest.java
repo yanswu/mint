@@ -12,7 +12,7 @@ import org.junit.Test;
 import idv.mint.bean.StockSheet;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.util.crawl.Crawler;
-import idv.mint.util.stock.StockCreator;
+import idv.mint.util.stock.StockConverter;
 
 public class FileCrawlerTest {
 
@@ -40,7 +40,7 @@ public class FileCrawlerTest {
 	String stockCode = "1773";
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
-	List<StockSheet> stockSheetList = StockCreator.createStockSheetList(epsLines, dividendLines);
+	List<StockSheet> stockSheetList = StockConverter.createStockSheetList(epsLines, dividendLines);
 
 	stockSheetList.stream().forEach(sheet -> {
 	    int year = sheet.getBaseDate().getYear();
@@ -72,7 +72,7 @@ public class FileCrawlerTest {
 	String stockCode = "6261";
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
-	List<StockSheet> stockSheetList = StockCreator.createStockSheetList(epsLines, dividendLines);
+	List<StockSheet> stockSheetList = StockConverter.createStockSheetList(epsLines, dividendLines);
 
 	stockSheetList.stream().forEach(sheet -> {
 	    int year = sheet.getBaseDate().getYear();

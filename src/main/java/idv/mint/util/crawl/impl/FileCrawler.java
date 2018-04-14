@@ -13,7 +13,6 @@ import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
 import idv.mint.util.crawl.Crawler;
-import idv.mint.util.stock.StockCreator;
 
 public class FileCrawler implements Crawler {
 
@@ -39,88 +38,109 @@ public class FileCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockEPSLines(String stockCode) throws IOException {
+    public List<String> getStockEPSLines(String stockCode) {
 
-	StockMarketType stockMarketType = getStockMarketType(stockCode);
+	try {
 
-	Path readPath = null;
+	    StockMarketType stockMarketType = getStockMarketType(stockCode);
 
-	if (stockMarketType.isTSE()) {
-	    readPath = PathSettings.STOCK_EPS_TSE_CSV.getPath();
-	} else if (stockMarketType.isOTC()) {
-	    readPath = PathSettings.STOCK_EPS_OTC_CSV.getPath();
+	    Path readPath = null;
+
+	    if (stockMarketType.isTSE()) {
+		readPath = PathSettings.STOCK_EPS_TSE_CSV.getPath();
+	    } else if (stockMarketType.isOTC()) {
+		readPath = PathSettings.STOCK_EPS_OTC_CSV.getPath();
+	    }
+
+	    if (readPath != null) {
+
+		List<String> lines = Files.readAllLines(readPath);
+		return lines.stream().filter(line -> {
+		    return StringUtils.equals(stockCode, StringUtils.split(line, ",")[0]);
+		}).collect(Collectors.toList());
+	    }
+
+	    return new ArrayList<>();
+
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
 	}
 
-	if (readPath != null) {
+    }
 
-	    List<String> lines = Files.readAllLines(readPath);
-	    return lines.stream().filter(line -> {
-		return StringUtils.equals(stockCode, StringUtils.split(line, ",")[0]);
-	    }).collect(Collectors.toList());
+    @Override
+    public List<String> getStockDividendLines(String stockCode) {
+
+	try {
+
+	    StockMarketType stockMarketType = getStockMarketType(stockCode);
+
+	    Path readPath = null;
+
+	    if (stockMarketType.isTSE()) {
+		readPath = PathSettings.STOCK_DIVIDEND_TSE_CSV.getPath();
+	    } else if (stockMarketType.isOTC()) {
+		readPath = PathSettings.STOCK_DIVIDEND_OTC_CSV.getPath();
+	    }
+
+	    if (readPath != null) {
+
+		String comma = SymbolType.COMMA.getValue();
+
+		List<String> lines = Files.readAllLines(readPath);
+
+		return lines.stream().filter(line -> {
+		    return StringUtils.equals(stockCode, StringUtils.split(line, comma)[0]);
+		}).collect(Collectors.toList());
+
+	    }
+
+	} catch (Exception e) {
+
+	    throw new RuntimeException(e);
 	}
 
 	return new ArrayList<>();
     }
 
     @Override
-    public List<String> getStockDividendLines(String stockCode) throws IOException {
-
-	StockMarketType stockMarketType = getStockMarketType(stockCode);
-
-	Path readPath = null;
-
-	if (stockMarketType.isTSE()) {
-	    readPath = PathSettings.STOCK_DIVIDEND_TSE_CSV.getPath();
-	} else if (stockMarketType.isOTC()) {
-	    readPath = PathSettings.STOCK_DIVIDEND_OTC_CSV.getPath();
-	}
-
-	if (readPath != null) {
-
-	    String comma = SymbolType.COMMA.getValue();
-	    
-	    List<String> lines = Files.readAllLines(readPath);
-	    
-	    return lines.stream().filter(line -> {
-		return StringUtils.equals(stockCode, StringUtils.split(line, comma)[0]);
-	    }).collect(Collectors.toList());
-	    
-	}
-
-	return new ArrayList<>();
-    }
-
-    @Override
-    public List<String> getStockLines(StockMarketType marketType) throws IOException {
+    public List<String> getStockLines(StockMarketType marketType) {
 
 	if (marketType == null || marketType.isUnknown()) {
 	    return new ArrayList<>();
 	}
 
-	Path path = null;
+	try {
 
-	if (marketType.isTSE()) {
-	    path = PathSettings.STOCK_TSE_CSV.getPath();
-	} else if (marketType.isOTC()) {
-	    path = PathSettings.STOCK_OTC_CSV.getPath();
+	    Path path = null;
+
+	    if (marketType.isTSE()) {
+		path = PathSettings.STOCK_TSE_CSV.getPath();
+	    } else if (marketType.isOTC()) {
+		path = PathSettings.STOCK_OTC_CSV.getPath();
+	    }
+
+	    return Files.readAllLines(path);
+
+	} catch (Exception e) {
+
+	    throw new RuntimeException(e);
 	}
 
-	return Files.readAllLines(path);
-	
     }
 
     @Override
-    public List<String> getStockLines(StockMarketType marketType, String categoryName) throws IOException {
-	
+    public List<String> getStockLines(StockMarketType marketType, String categoryName) {
+
 	List<String> lines = getStockLines(marketType);
-	
+
 	String comma = SymbolType.COMMA.getValue();
-	
-	return lines.stream().filter(line ->{
-	    String[] sections = StringUtils.split(line,comma);
+
+	return lines.stream().filter(line -> {
+	    String[] sections = StringUtils.split(line, comma);
 	    return StringUtils.equals(categoryName, sections[2]);
 	}).collect(Collectors.toList());
-	
+
     }
 
     private StockMarketType getStockMarketType(String stockCode) throws IOException {
@@ -144,5 +164,11 @@ public class FileCrawler implements Crawler {
 	    return StringUtils.split(line, ",")[3].equals(stockCode);
 	}).count();
 	return counts > 0;
+    }
+
+    @Override
+    public List<String> getStockRoeNetIncomeLines(String stockCode) {
+	// TODO Auto-generated method stub
+	return null;
     }
 }

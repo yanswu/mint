@@ -36,14 +36,13 @@ public interface Crawler {
     
     /**
      * <pre>
-     *  marketType,categoryName (市場分類, 分類名稱)
+     *  pattern : stockCode,stockName (2330, TSMC)
      * </pre>
      * @param marketType
      * @param categoryName
      * @return
-     * @throws IOException
      */
-    public List<String> getStockLines(StockMarketType marketType,String categoryName)throws IOException;
+    public List<String> getStockLines(StockMarketType marketType,String categoryName);
     /**
      * <pre>
      *  marketType (市場分類)
@@ -65,11 +64,12 @@ public interface Crawler {
      * @return
      * @throws IOException
      */
-    public List<String> getStockEPSLines(String stockCode) throws IOException ;
+    public List<String> getStockEPSLines(String stockCode)  ;
     
     /**
      * <pre>
      * pattern : stockCode, rocYear, cashDividend, stockDividend
+     * 2330,105,7.00,0.00
      * </pre>
      * 取得歷年度股利(股票股利 現金股利)
      * 
@@ -77,5 +77,17 @@ public interface Crawler {
      * @return
      * @throws IOException
      */
-    public List<String> getStockDividendLines(String stockCode) throws IOException ;
+    public List<String> getStockDividendLines(String stockCode) ;
+    
+    public List<String> getStockRoeNetIncomeLines(String stockCode);
+    
+    /**
+     * @param stockCode
+     * @return
+     */
+    default public String getStockPrice(String stockCode) {
+	return null;
+    }
+
+
 }

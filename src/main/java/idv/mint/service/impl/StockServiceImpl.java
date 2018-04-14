@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -31,9 +30,11 @@ import idv.mint.entity.StockSheetEntity;
 import idv.mint.entity.StockSheetPk;
 import idv.mint.entity.enums.OverseasType;
 import idv.mint.entity.enums.StockMarketType;
+import idv.mint.service.CrawlerService;
 import idv.mint.service.StockService;
 import idv.mint.util.crawl.Crawler;
-import idv.mint.util.stock.StockCreator;
+import idv.mint.util.stock.StockConverter;
+import idv.mint.util.stock.StockUtils;
 
 @Service("stockService")
 public class StockServiceImpl implements StockService {
@@ -48,6 +49,9 @@ public class StockServiceImpl implements StockService {
 
     @Autowired
     private StockSheetDao stockSheetDao;
+
+    @Autowired
+    private CrawlerService crawlerService;
 
     @Transactional
     @Override
@@ -189,11 +193,15 @@ public class StockServiceImpl implements StockService {
 		
 		stockSheet.setCashDividend(entity.getCashDividend());
 		stockSheet.setStockDividend(entity.getStockDividend());
+		
 		return stockSheet;
 
 	    }).collect(Collectors.toList());
 	}
 
+	// 計算還原股價
+	BigDecimal stockPrice = crawlerService.getStockPrice(stockCode);
+	StockUtils.calculateValuePrice(stockPrice,stockSheetList);
 	stock.setStockSheetList(stockSheetList);
 
 	return stock;
@@ -207,7 +215,7 @@ public class StockServiceImpl implements StockService {
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 	String lastLine = epsLines.get(epsLines.size() - 1);
 
-	StockSheet stockSheet = StockCreator.createStockSheetEps(lastLine);
+	StockSheet stockSheet = StockConverter.createStockSheetEps(lastLine);
 
 	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
 
@@ -228,7 +236,7 @@ public class StockServiceImpl implements StockService {
 
 	String lastLine = dividendLines.get(0);
 
-	StockSheet stockSheet = StockCreator.createStockSheetDividend(lastLine);
+	StockSheet stockSheet = StockConverter.createStockSheetDividend(lastLine);
 
 	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
 
