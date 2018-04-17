@@ -79,7 +79,26 @@ public interface Crawler {
      */
     public List<String> getStockDividendLines(String stockCode) ;
     
-    public List<String> getStockRoeNetIncomeLines(String stockCode);
+    /**
+     * <pre>
+     * 	    pattern : stockCode,rocYear,netIncome 
+     * 	    年合併損益表
+     * </pre>
+     * @param stockCode
+     * @return
+     */
+    public List<String> getIncomeStatementLines(String stockCode);
+    
+    /**
+     * <pre>
+     * 	股票代號,民國年,長期投資,固定資產,股東權益
+     * 	pattern : stockCode,rocYear,longTermInvest,fixedAsset,shareholderEquity 
+     * 	     
+     * </pre>
+     * @param stockCode
+     * @return
+     */
+    public List<String> getBalanceSheetLines(String stockCode);
     
     /**
      * @param stockCode

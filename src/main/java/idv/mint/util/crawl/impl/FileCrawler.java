@@ -167,7 +167,13 @@ public class FileCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockRoeNetIncomeLines(String stockCode) {
+    public List<String> getIncomeStatementLines(String stockCode) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public List<String> getBalanceSheetLines(String stockCode) {
 	// TODO Auto-generated method stub
 	return null;
     }

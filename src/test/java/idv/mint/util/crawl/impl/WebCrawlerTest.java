@@ -10,10 +10,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.util.crawl.Crawler;
 
 public class WebCrawlerTest {
+
+    private static String comma = SymbolType.COMMA.getValue();
 
     @Test
     public void testGetStockCategoryLinesTse() throws Exception {
@@ -63,7 +66,7 @@ public class WebCrawlerTest {
 
 	Crawler crawler = Crawler.createWebCrawler();
 	List<String> lines = crawler.getStockLines(StockMarketType.OTC, "食品");
-//	lines.forEach(System.out::println);
+	// lines.forEach(System.out::println);
 	assertFalse(lines.isEmpty());
 	assertEquals(lines.get(0), "1258,其祥-KY");
 	assertEquals(lines.get(1), "1264,德麥");
@@ -136,14 +139,13 @@ public class WebCrawlerTest {
 	});
     }
 
-    
     @Test
     public void testGetStockLines() throws IOException {
 
 	Crawler crawler = Crawler.createWebCrawler();
 	List<String> lines = crawler.getStockLines(StockMarketType.OTC, "生技");
 	lines.stream().forEach(System.out::println);
-	
+
 	lines.stream().forEach(line -> {
 	    String[] sections = StringUtils.split(line, ",");
 	    if (StringUtils.equals(sections[0], "4157")) {
@@ -152,18 +154,18 @@ public class WebCrawlerTest {
 
 	});
     }
-    
+
     @Test
-    public void testGetStockNameByHiStock() throws IOException{
-	
-	String stockCode = "4157"; 
+    public void testGetStockNameByHiStock() throws IOException {
+
+	String stockCode = "4157";
 	String stockName = new WebCrawler().getStockNameByHiStock(stockCode);
 	assertEquals("太景*-KY", stockName);
     }
 
     @Test
-    public void testGetStockPrice() throws IOException{
-	
+    public void testGetStockPrice() throws IOException {
+
 	String stockCode = "1773";
 	Crawler crawler = Crawler.createWebCrawler();
 	String price = crawler.getStockPrice(stockCode);
@@ -171,13 +173,31 @@ public class WebCrawlerTest {
     }
 
     @Test
-    public void testGetStockRoeNetIncomeLines() throws IOException{
-	
+    public void testGetIncomeStatementLines() throws IOException {
+
 	String stockCode = "1773";
 	Crawler crawler = Crawler.createWebCrawler();
-	crawler.getStockRoeNetIncomeLines(stockCode);
+	List<String> lines = crawler.getIncomeStatementLines(stockCode);
+	
+	assertNotNull(lines);
+	
+	lines.stream().forEach(line -> {
+
+	    String[] sections = line.split(comma);
+	    
+	    if (StringUtils.equals("106", sections[1])) {
+		assertEquals(sections[2], "879");
+	    }
+	    
+	    if (StringUtils.equals("105", sections[1])) {
+		assertEquals(sections[2], "785");
+	    }
+	    
+	    if (StringUtils.equals("99", sections[1])) {
+		assertEquals(sections[2], "650");
+	    }
+	});
 	assertNotNull("");
     }
-    
-    
+
 }

@@ -35,8 +35,14 @@ public class NonOpCrawler implements Crawler {
     }
 
     @Override
-    public List<String> getStockRoeNetIncomeLines(String stockCode) {
+    public List<String> getIncomeStatementLines(String stockCode) {
 	return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getBalanceSheetLines(String stockCode) {
+	// TODO Auto-generated method stub
+	return null;
     }
 
 

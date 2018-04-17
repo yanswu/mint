@@ -23,7 +23,18 @@ public enum PathSettings {
     /**cash dividend stock dividend */
     STOCK_DIVIDEND_TSE_CSV("stockDividendTse.csv"),
     
-    STOCK_DIVIDEND_OTC_CSV("stockDividendOtc.csv");
+    STOCK_DIVIDEND_OTC_CSV("stockDividendOtc.csv"),
+
+    /** stock incomeStatement */
+    STOCK_INCOMESTATEMENT_TSE_CSV("stockIncomeStatementTse.csv"),
+    
+    STOCK_INCOMESTATEMENT_OTC_CSV("stockIncomeStatementOtc.csv"),
+
+    /** stock balanceSheet */
+    STOCK_BALANCESHEET_TSE_CSV("stockBalanceSheetTse.csv"),
+    
+    STOCK_BALANCESHEET_OTC_CSV("stockBalanceSheetOtc.csv");
+    
 
     private String STOCK_FILE_FOLDER = "src/main/resources/data/stock";
 
