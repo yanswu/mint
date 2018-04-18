@@ -178,26 +178,66 @@ public class WebCrawlerTest {
 	String stockCode = "1773";
 	Crawler crawler = Crawler.createWebCrawler();
 	List<String> lines = crawler.getIncomeStatementLines(stockCode);
-	
+
 	assertNotNull(lines);
-	
+
 	lines.stream().forEach(line -> {
 
 	    String[] sections = line.split(comma);
+	    String rocYear = sections[1];
+	    String netIncome = sections[2];
+
 	    
-	    if (StringUtils.equals("106", sections[1])) {
-		assertEquals(sections[2], "879");
+	    if (StringUtils.equals("106", rocYear)) {
+		assertEquals("879", netIncome);
 	    }
-	    
-	    if (StringUtils.equals("105", sections[1])) {
-		assertEquals(sections[2], "785");
+
+	    if (StringUtils.equals("105", rocYear)) {
+		assertEquals("785", netIncome);
 	    }
-	    
-	    if (StringUtils.equals("99", sections[1])) {
-		assertEquals(sections[2], "650");
+
+	    if (StringUtils.equals("99", rocYear)) {
+		assertEquals("650", netIncome);
 	    }
 	});
-	assertNotNull("");
+    }
+
+    @Test
+    public void testGetBalanceSheetLines() throws IOException {
+
+	String stockCode = "1773";
+	Crawler crawler = Crawler.createWebCrawler();
+	List<String> lines = crawler.getBalanceSheetLines(stockCode);
+
+	assertNotNull(lines);
+
+	lines.stream().forEach(line -> {
+
+	    String[] sections = line.split(comma);
+
+	    String rocYear = sections[1];
+	    String longTermInvest = sections[2];
+	    String fixedAsset = sections[3];
+	    String shareHolderEquity = sections[4];
+	    
+	    if (StringUtils.equals("106", rocYear)) {
+		assertEquals("1095", longTermInvest);
+		assertEquals("1709", fixedAsset);
+		assertEquals("4503", shareHolderEquity);
+	    }
+
+	    if (StringUtils.equals("105", rocYear)) {
+		assertEquals("1123", longTermInvest);
+		assertEquals("1514", fixedAsset);
+		assertEquals("4251", shareHolderEquity);
+	    }
+
+	    if (StringUtils.equals("99", rocYear)) {
+		assertEquals("841", longTermInvest);
+		assertEquals("1336", fixedAsset);
+		assertEquals("3234", shareHolderEquity);
+	    }
+	});
     }
 
 }

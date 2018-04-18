@@ -35,7 +35,7 @@ public class WebCrawler implements Crawler {
     private static final Logger logger = LogManager.getLogger(WebCrawler.class);
 
     private static final Integer RETRY_TIMES = 3;
-    
+
     private static String comma = SymbolType.COMMA.getValue();
 
     public WebCrawler() {
@@ -302,7 +302,7 @@ public class WebCrawler implements Crawler {
 
 	return new ArrayList<>();
     }
-    
+
     @Override
     public List<String> getIncomeStatementLines(String stockCode) {
 
@@ -315,28 +315,29 @@ public class WebCrawler implements Crawler {
     }
 
     public List<String> getIncomeStatementLines(String stockCode, Integer reTryTimes) throws IOException {
-	
+
 	// 年合併損益表
 	String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcq/zcqa/zcqa_%s.djhtm";
-	
+
 	String url = String.format(urlTemplate, stockCode);
 
 	try {
 
 	    Document document = JsoupUtils.getDocument(url);
-//	    logger.debug(document.toString());
+	    // logger.debug(document.toString());
 	    Elements elements = document.select("table.t01 >tbody tr");
-	    
+
 	    // rocYear
 	    Elements yearTDList = elements.get(1).select("td");
 	    // netIncome
 	    Elements netIncomeTDList = elements.get(49).select("td");
-	    
+
 	    List<String> lines = new ArrayList<>();
-	    
-	    for(int i = 1 ;i< yearTDList.size();i++) {
+
+	    for (int i = 1; i < yearTDList.size(); i++) {
 		String rocYear = yearTDList.get(i).text();
-		String netIncome = netIncomeTDList.get(i).text();
+		// 2,100 --> 2100
+		String netIncome = StringUtils.remove(netIncomeTDList.get(i).text(), comma);
 		String line = String.join(comma, stockCode, rocYear, netIncome);
 		lines.add(line);
 	    }
@@ -359,32 +360,60 @@ public class WebCrawler implements Crawler {
 
 		return getIncomeStatementLines(stockCode, reTryTimes - 1);
 	    }
-
 	}
-	
-	Path path = Paths.get("C:/novel.txt");
-	Files.write(path, url.getBytes() ,StandardOpenOption.APPEND);
+
+	writeErrorLogFile(url);
+
 	return new ArrayList<>();
     }
-    
+
     @Override
-    public List<String> getBalanceSheetLines(String stockCode){
-	
-	return getBalanceSheetLines(stockCode, RETRY_TIMES);
+    public List<String> getBalanceSheetLines(String stockCode) {
+
+	try {
+	    return getBalanceSheetLines(stockCode, RETRY_TIMES);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	return new ArrayList<>();
     }
 
-    public List<String> getBalanceSheetLines(String stockCode,int reTryTimes){
-	
-	// 年合併資產負債表 
+    public List<String> getBalanceSheetLines(String stockCode, int reTryTimes) throws IOException {
+
+	// 年合併資產負債表
 	String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcp/zcpb/zcpb_%s.djhtm";
-	
+
 	String url = String.format(urlTemplate, stockCode);
 
 	try {
 	    Document document = JsoupUtils.getDocument(url);
-//	    logger.debug(document.toString());
-	    Element element = document.select("table#FINANCE_INCOME_M  ").get(0);
-	    logger.debug(element.toString());
+
+	    Elements elements = document.select("table.t01 >tbody tr");
+
+	    // logger.debug(document.toString());
+	    // rocYear
+	    Elements yearTDList = elements.get(1).select("td");
+
+	    // longTermInvest 長期投資
+	    Elements longTermInvestTDList = elements.get(12).select("td");
+	    // fixedAsset 固定資產
+	    Elements fixedAssetTDList = elements.get(21).select("td");
+	    // shareHolderEquity 股東權益
+	    Elements shareholderEquityTDList = elements.get(57).select("td");
+
+	    List<String> lines = new ArrayList<>();
+
+	    for (int i = 1; i < yearTDList.size(); i++) {
+		String rocYear = yearTDList.get(i).text();
+		// 2,100 --> 2100
+		String longTermInvest = StringUtils.remove(longTermInvestTDList.get(i).text(), comma);
+		String fixedAsset = StringUtils.remove(fixedAssetTDList.get(i).text(), comma);
+		String shareHolderEquity = StringUtils.remove(shareholderEquityTDList.get(i).text(), comma);
+		String line = String.join(comma, stockCode, rocYear, longTermInvest, fixedAsset, shareHolderEquity);
+		lines.add(line);
+	    }
+
+	    return lines;
 
 	} catch (Exception e) {
 
@@ -405,11 +434,15 @@ public class WebCrawler implements Crawler {
 	    }
 
 	}
-
+	writeErrorLogFile(url);
 	return new ArrayList<>();
     }
-    
-    
+
+    private static void writeErrorLogFile(String url) throws IOException {
+
+	Path path = Paths.get("C:/novel.txt");
+	Files.write(path, url.getBytes(), StandardOpenOption.APPEND);
+    }
 
     public String getStockNameByHiStock(String stockCode) throws IOException {
 

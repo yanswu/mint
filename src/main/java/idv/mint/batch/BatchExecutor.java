@@ -3,6 +3,7 @@ package idv.mint.batch;
 import java.util.HashMap;
 import java.util.Map;
 
+import idv.mint.batch.executor.StockBalanceSheetCsvHandler;
 import idv.mint.batch.executor.StockCategoryCsvHandler;
 import idv.mint.batch.executor.StockCsvHandler;
 import idv.mint.batch.executor.StockDividendCsvHandler;
@@ -20,7 +21,9 @@ public class BatchExecutor {
 	
 //	updateSheet(params);
 
-	updateIncomeStatement(params);
+//	updateIncomeStatement(params);
+	
+	updateBalanceSheet(params);
     }
     
     private static void updateStockAndCategory(Map<String, Object> params) {
@@ -52,6 +55,14 @@ public class BatchExecutor {
 	StockIncomeStatementCsvHandler incomeStatementCsvHandler = new StockIncomeStatementCsvHandler();
 	
 	incomeStatementCsvHandler.executeTask(params);
+	
+    }
+
+    private static void updateBalanceSheet(Map<String, Object> params) {
+	
+	StockBalanceSheetCsvHandler balanceSheetCsvHandler = new StockBalanceSheetCsvHandler();
+	
+	balanceSheetCsvHandler.executeTask(params);
 	
     }
     
