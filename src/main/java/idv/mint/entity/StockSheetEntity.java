@@ -35,6 +35,18 @@ public class StockSheetEntity {
     @Column(name = "STOCK_DIVIDEND")
     private BigDecimal stockDividend;
 
+    @Column(name = "NET_INCOME")
+    private BigDecimal netIncome;
+
+    @Column(name = "LONG_TERM_INVEST")
+    private BigDecimal longTermInvest;
+
+    @Column(name = "FIXED_ASSET")
+    private BigDecimal fixedAsset;
+
+    @Column(name = "SHAREHOLDER_EQUITY")
+    private BigDecimal shareholderEquity;
+
     @Column(name = "INSERT_TIME")
     private LocalDateTime insertTime;
 
@@ -98,6 +110,38 @@ public class StockSheetEntity {
 
     public void setStockDividend(BigDecimal stockDividend) {
 	this.stockDividend = stockDividend;
+    }
+
+    public BigDecimal getNetIncome() {
+	return netIncome;
+    }
+
+    public void setNetIncome(BigDecimal netIncome) {
+	this.netIncome = netIncome;
+    }
+
+    public BigDecimal getLongTermInvest() {
+	return longTermInvest;
+    }
+
+    public void setLongTermInvest(BigDecimal longTermInvest) {
+	this.longTermInvest = longTermInvest;
+    }
+
+    public BigDecimal getFixedAsset() {
+	return fixedAsset;
+    }
+
+    public void setFixedAsset(BigDecimal fixedAsset) {
+	this.fixedAsset = fixedAsset;
+    }
+
+    public BigDecimal getShareholderEquity() {
+	return shareholderEquity;
+    }
+
+    public void setShareholderEquity(BigDecimal shareholderEquity) {
+	this.shareholderEquity = shareholderEquity;
     }
 
     public LocalDateTime getInsertTime() {

@@ -101,6 +101,17 @@ public interface Crawler {
     public List<String> getBalanceSheetLines(String stockCode);
     
     /**
+     * 
+     * 	股票代號,民國年,最低股價,最高股股
+     * 	pattern : stockCode,rocYear,lowPrice,highPrice
+     * 
+     * @param stockCode
+     * @return
+     */
+    public List<String> getStockPriceHistoryLines(String stockCode);
+    
+    /**
+     * only WebCrawler override this method
      * @param stockCode
      * @return
      */

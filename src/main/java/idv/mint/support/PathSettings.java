@@ -33,7 +33,12 @@ public enum PathSettings {
     /** stock balanceSheet */
     STOCK_BALANCESHEET_TSE_CSV("stockBalanceSheetTse.csv"),
     
-    STOCK_BALANCESHEET_OTC_CSV("stockBalanceSheetOtc.csv");
+    STOCK_BALANCESHEET_OTC_CSV("stockBalanceSheetOtc.csv"),
+
+    /** stock price history */
+    STOCK_PRICE_HISTORY_TSE_CSV("stockPriceHistoryTse.csv"),
+    
+    STOCK_PRICE_HISTORY_OTC_CSV("stockPriceHistoryOtc.csv");
     
 
     private String STOCK_FILE_FOLDER = "src/main/resources/data/stock";

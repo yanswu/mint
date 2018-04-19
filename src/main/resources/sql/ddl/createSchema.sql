@@ -25,8 +25,10 @@ create table T_STOCK_SHEET (
         CASH_DIVIDEND numeric(19, 2),
         STOCK_DIVIDEND numeric(19, 2),
         NET_INCOME numeric(19, 2),
-        ROE_RATE numeric(19, 2),
-        INSERT_TIME TIMESTAMP  DEFAULT now(),
+        LONG_TERM_INVEST numeric(19, 2),
+        FIXED_ASSET numeric(19, 2),
+        SHAREHOLDER_EQUITY  numeric(19, 2),
+        INSERT_TIME TIMESTAMP ,
         UPDATE_TIME TIMESTAMP ,
         primary key (STOCK_ID,CAL_YEAR)
     );

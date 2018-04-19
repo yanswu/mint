@@ -434,14 +434,81 @@ public class WebCrawler implements Crawler {
 	    }
 
 	}
+
 	writeErrorLogFile(url);
+
 	return new ArrayList<>();
     }
 
-    private static void writeErrorLogFile(String url) throws IOException {
+    @Override
+    public List<String> getStockPriceHistoryLines(String stockCode) {
 
-	Path path = Paths.get("C:/novel.txt");
-	Files.write(path, url.getBytes(), StandardOpenOption.APPEND);
+	try {
+	    return getStockPriceHistoryLines(stockCode, RETRY_TIMES);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	return new ArrayList<>();
+    }
+
+    public List<String> getStockPriceHistoryLines(String stockCode, int reTryTimes) throws IOException {
+
+	// 歷史股價表
+	String urlTemplate = "https://goodinfo.tw/StockInfo/StockDividendPolicy.asp?STOCK_ID=%s";
+
+	String url = String.format(urlTemplate, stockCode);
+
+	try {
+	    Document document = JsoupUtils.getDocument(url);
+
+	    Elements elements = document.select("div#divDetail > table > tbody tr");
+
+	    // logger.debug(document.toString());
+
+	    List<String> lines = new ArrayList<>();
+
+	    for (Element el : elements) {
+
+		Elements tdList = el.select("td");
+
+		String rocYear = tdList.get(14).text();
+
+		if (StringUtils.isNotBlank(rocYear) && NumberUtils.isNumber(rocYear)) {
+
+		    String highPrice = StringUtils.remove(tdList.get(15).text(), comma);
+		    String lowPrice = StringUtils.remove(tdList.get(16).text(), comma);
+
+		    String line = String.join(comma, stockCode, rocYear, lowPrice, highPrice);
+
+		    lines.add(line);
+		}
+	    }
+
+	    return lines;
+
+	} catch (Exception e) {
+
+	    logger.error(String.format("url [%s]", url), e);
+
+	    if (reTryTimes > 1) {
+
+		try {
+
+		    Thread.sleep(new Random().nextInt(9) * 1000);
+
+		} catch (InterruptedException e1) {
+
+		    e1.printStackTrace();
+		}
+
+		return getStockPriceHistoryLines(stockCode, reTryTimes - 1);
+	    }
+
+	}
+
+	writeErrorLogFile(url);
+
+	return new ArrayList<>();
     }
 
     public String getStockNameByHiStock(String stockCode) throws IOException {
@@ -452,6 +519,16 @@ public class WebCrawler implements Crawler {
 	// logger.debug(document.toString());
 	Elements h3 = document.select("div.info-left.w600 > div h3 ");
 	return h3.text();
+    }
+
+    private static void writeErrorLogFile(String message) throws IOException {
+
+	Path path = Paths.get("C:/novel.txt");
+
+	StringBuilder sb = new StringBuilder();
+	sb.append(message);
+	sb.append(System.lineSeparator());
+	Files.write(path, message.getBytes(), StandardOpenOption.APPEND);
     }
 
     /*

@@ -177,4 +177,10 @@ public class FileCrawler implements Crawler {
 	// TODO Auto-generated method stub
 	return null;
     }
+
+    @Override
+    public List<String> getStockPriceHistoryLines(String stockCode) {
+	// TODO Auto-generated method stub
+	return null;
+    }
 }

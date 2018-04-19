@@ -9,6 +9,7 @@ import idv.mint.batch.executor.StockCsvHandler;
 import idv.mint.batch.executor.StockDividendCsvHandler;
 import idv.mint.batch.executor.StockEpsCsvHandler;
 import idv.mint.batch.executor.StockIncomeStatementCsvHandler;
+import idv.mint.batch.executor.StockPriceHistoryCsvHandler;
 
 public class BatchExecutor {
     
@@ -23,7 +24,11 @@ public class BatchExecutor {
 
 //	updateIncomeStatement(params);
 	
-	updateBalanceSheet(params);
+//	updateBalanceSheet(params);
+
+	updateStockPriceHistory(params);
+	
+	
     }
     
     private static void updateStockAndCategory(Map<String, Object> params) {
@@ -63,6 +68,14 @@ public class BatchExecutor {
 	StockBalanceSheetCsvHandler balanceSheetCsvHandler = new StockBalanceSheetCsvHandler();
 	
 	balanceSheetCsvHandler.executeTask(params);
+	
+    }
+
+    private static void updateStockPriceHistory(Map<String, Object> params) {
+	
+	StockPriceHistoryCsvHandler stockPriceCsvHandler = new StockPriceHistoryCsvHandler();
+	
+	stockPriceCsvHandler.executeTask(params);
 	
     }
     

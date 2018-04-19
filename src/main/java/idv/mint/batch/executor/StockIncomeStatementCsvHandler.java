@@ -24,7 +24,7 @@ public class StockIncomeStatementCsvHandler extends TaskHandler {
 
 	incomeStatementCsvWriter(PathSettings.STOCK_OTC_CSV, PathSettings.STOCK_INCOMESTATEMENT_OTC_CSV);
 
-	return false;
+	return true;
     }
 
     private void incomeStatementCsvWriter(PathSettings stockInPath, PathSettings stockOutPath) throws IOException {
