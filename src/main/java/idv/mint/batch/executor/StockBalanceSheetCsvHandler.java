@@ -41,6 +41,7 @@ public class StockBalanceSheetCsvHandler extends TaskHandler {
 	for (Stock stock : stockList) {
 	    
 	    List<String> balanceSheetLines = crawler.getBalanceSheetLines(stock.getStockCode());
+	    
 	    FileUtils.writeFileAppend(writePath, balanceSheetLines);
 	}
     }
