@@ -103,7 +103,7 @@ public interface Crawler {
     /**
      * 
      * 	股票代號,民國年,最低股價,最高股股
-     * 	pattern : stockCode,rocYear,lowPrice,highPrice
+     * 	pattern : stockCode,y2kYear,lowPrice,highPrice
      * 
      * @param stockCode
      * @return
