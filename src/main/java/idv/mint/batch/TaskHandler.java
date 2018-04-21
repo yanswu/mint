@@ -27,7 +27,7 @@ public abstract class TaskHandler {
 	this.next = next;
     }
 
-    protected void setNextHandler(TaskHandler next) {
+    public void setNextHandler(TaskHandler next) {
 	this.next = next;
     }
 
