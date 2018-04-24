@@ -3,10 +3,11 @@ package idv.mint.batch;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public abstract class TaskHandler {
 
@@ -31,37 +32,49 @@ public abstract class TaskHandler {
 	this.next = next;
     }
 
-    public abstract boolean execute(Map<String, Object> params) throws Exception;
+    public abstract boolean execute(Context<BatchSettings, Object> context) throws Exception;
 
-    public void executeTask(Map<String, Object> params) {
+    public void executeTask(Context<BatchSettings, Object> context) {
 
 	try {
 
 	    taskStartTime = LocalDateTime.now();
 
-	    boolean success = execute(params);
+	    boolean success = execute(context);
 
 	    taskEndTime = LocalDateTime.now();
 
-	    taskProcessTimes(taskStartTime, taskEndTime);
+	    taskExecuteConsoleLog(taskStartTime, taskEndTime);
 
 	    if (success) {
-		doNextHandler(params);
+		doNextHandler(context);
 	    } else {
 	    }
 	} catch (Exception e) {
 
+	} finally {
+
+	    Optional<AnnotationConfigApplicationContext> springContextOptional = ContextParamUtils.getSpringAppContext(context);
+	    if (springContextOptional.isPresent()) {
+		AnnotationConfigApplicationContext springContext = springContextOptional.get();
+		springContext.close();
+	    }
 	}
     }
 
-    protected void doNextHandler(Map<String, Object> params) {
+    protected void doNextHandler(Context<BatchSettings, Object> context) {
 
 	if (next != null) {
-	    next.executeTask(params);
+	    next.executeTask(context);
 	}
     }
 
-    private static void taskProcessTimes(LocalDateTime startTime, LocalDateTime endTime) {
+    protected <T> T getSpringBean(Context<BatchSettings, Object> context, Class<T> clazz) {
+
+	return ContextParamUtils.getSpringAppContext(context).get().getBean(clazz);
+    }
+
+    private static void taskExecuteConsoleLog(LocalDateTime startTime, LocalDateTime endTime) {
 
 	if (startTime != null && endTime != null) {
 
@@ -69,8 +82,8 @@ public abstract class TaskHandler {
 	    Duration duration = Duration.between(startTime, endTime);
 	    seconds = duration.getSeconds();
 
-	    logger.info("Task startTime [" + startTime.format(formatter) + "], endTime [" + endTime.format(formatter) + "]");
-	    logger.info("it spends " + seconds + " seconds");
+	    System.out.printf("Task startTime [%s], endTime [%s] \n ", startTime.format(formatter), endTime.format(formatter));
+	    System.out.printf("it spends %d seconds ", seconds);
 	}
     }
 

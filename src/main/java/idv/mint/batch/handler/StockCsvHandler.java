@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import idv.mint.batch.BatchSettings;
+import idv.mint.batch.Context;
 import idv.mint.batch.TaskHandler;
 import idv.mint.bean.StockCategory;
 import idv.mint.context.enums.SymbolType;
@@ -27,7 +29,7 @@ public class StockCsvHandler extends TaskHandler {
     };
 
     @Override
-    public boolean execute(Map<String, Object> params) throws Exception {
+    public boolean execute(Context<BatchSettings, Object> context) throws Exception {
 
 	try {
 

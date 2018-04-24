@@ -10,6 +10,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import idv.mint.entity.pk.StockSheetPk;
+
 @Entity
 @Table(name = "T_STOCK_SHEET")
 public class StockSheetEntity {

@@ -5,8 +5,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
+import idv.mint.batch.BatchSettings;
+import idv.mint.batch.Context;
 import idv.mint.batch.TaskHandler;
 import idv.mint.bean.Stock;
 import idv.mint.support.PathSettings;
@@ -17,7 +18,7 @@ import idv.mint.util.stock.StockConverter;
 public class StockBalanceSheetCsvHandler extends TaskHandler {
 
     @Override
-    public boolean execute(Map<String, Object> params) throws Exception {
+    public boolean execute(Context<BatchSettings, Object> context) throws Exception {
 
 	balanceSheetCsvWriter(PathSettings.STOCK_TSE_CSV, PathSettings.STOCK_BALANCESHEET_TSE_CSV);
 

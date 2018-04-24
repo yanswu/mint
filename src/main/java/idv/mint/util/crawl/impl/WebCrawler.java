@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -471,17 +472,16 @@ public class WebCrawler implements Crawler {
 
 		Elements tdList = el.select("td");
 
-		String rocYear = tdList.get(14).text();
+		String y2kYear = tdList.get(14).text();
 
-		if (StringUtils.isNotBlank(rocYear) && NumberUtils.isNumber(rocYear)) {
+		String highPrice = StringUtils.remove(tdList.get(15).text(), comma);
+		String lowPrice = StringUtils.remove(tdList.get(16).text(), comma);
+		String cash = tdList.get(3).text();
+		String shares = tdList.get(6).text();
+		
+		String line = String.join(comma, stockCode, y2kYear, lowPrice, highPrice, cash, shares);
 
-		    String highPrice = StringUtils.remove(tdList.get(15).text(), comma);
-		    String lowPrice = StringUtils.remove(tdList.get(16).text(), comma);
-
-		    String line = String.join(comma, stockCode, rocYear, lowPrice, highPrice);
-
-		    lines.add(line);
-		}
+		lines.add(line);
 	    }
 
 	    return lines;
@@ -493,8 +493,8 @@ public class WebCrawler implements Crawler {
 	    if (reTryTimes > 1) {
 
 		try {
-
-		    Thread.sleep(new Random().nextInt(9) * 1000);
+		    TimeUnit.SECONDS.sleep(2);
+//		    Thread.sleep(new Random().nextInt(9) * 1000);
 
 		} catch (InterruptedException e1) {
 
@@ -521,15 +521,16 @@ public class WebCrawler implements Crawler {
 	return h3.text();
     }
 
-    private static void writeErrorLogFile(String message) throws IOException {
+    public static void writeErrorLogFile(String message) throws IOException {
 
 	Path path = Paths.get("C:/novel.txt");
 
 	StringBuilder sb = new StringBuilder();
 	sb.append(message);
 	sb.append(System.lineSeparator());
-	Files.write(path, message.getBytes(), StandardOpenOption.APPEND);
+	Files.write(path, sb.toString().getBytes(), StandardOpenOption.APPEND);
     }
+    
 
     /*
      * patch stockName from HiStock website

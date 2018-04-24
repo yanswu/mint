@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import idv.mint.bean.StockSheet;
 import idv.mint.entity.StockSheetEntity;
-import idv.mint.entity.StockSheetPk;
+import idv.mint.entity.pk.StockSheetPk;
 
 @Repository("stockSheetDao")
 public class StockSheetDao extends AbstractDao<StockSheetPk, StockSheetEntity> {

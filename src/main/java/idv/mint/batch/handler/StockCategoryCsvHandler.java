@@ -3,8 +3,9 @@ package idv.mint.batch.handler;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
+import idv.mint.batch.BatchSettings;
+import idv.mint.batch.Context;
 import idv.mint.batch.TaskHandler;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
@@ -21,7 +22,7 @@ public class StockCategoryCsvHandler extends TaskHandler {
     }
 
     @Override
-    public boolean execute(Map<String, Object> params) throws Exception{
+    public boolean execute(Context<BatchSettings, Object> context) throws Exception{
 	
 	try {
 
