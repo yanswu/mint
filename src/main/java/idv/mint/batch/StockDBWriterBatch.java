@@ -39,7 +39,7 @@ public class StockDBWriterBatch extends AbstractBatchExecutor{
 
 	// 3.insert stockSheet
 	for (StockMarketType stockMarketType : marketTypes) {
-	    List<StockSheet> stockSheetList = crawlerService.getStockSheetList(fileCrawlType, stockMarketType);
+	    List<StockSheet> stockSheetList = crawlerService.getStockSheetList(stockMarketType);
 	    stockService.saveStockSheetEntities(stockSheetList);
 	}
 

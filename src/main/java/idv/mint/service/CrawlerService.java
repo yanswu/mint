@@ -56,15 +56,15 @@ public interface CrawlerService {
 
     /**
      * 
-     * @param type
      * @param marketType
      * @return
      * @throws IOException
      */
-    public List<StockSheet> getStockSheetList(CrawlType type, StockMarketType marketType) throws IOException;
-    
+    public List<StockSheet> getStockSheetList(StockMarketType marketType) throws IOException;
+
     /**
      * 取得目前股價
+     * 
      * @param stockCode
      * @return
      */

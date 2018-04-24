@@ -74,7 +74,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 	Crawler crawler = getCrawler(crawlType);
 
 	List<String> lines = crawler.getStockLines(marketType);
-	
+
 	stockList = StockConverter.convertStockList(lines);
 
 	return stockList;
@@ -90,9 +90,9 @@ public class CrawlerServiceImpl implements CrawlerService {
     public List<StockSheet> getStockSheetList(CrawlType crawlType, String stockCode) throws IOException {
 
 	Crawler crawler = getCrawler(crawlType);
-	
+
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
-	
+
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
 	return StockConverter.createStockSheetList(epsLines, dividendLines);
@@ -115,7 +115,7 @@ public class CrawlerServiceImpl implements CrawlerService {
     }
 
     @Override
-    public List<StockSheet> getStockSheetList(CrawlType type, StockMarketType marketType) throws IOException {
+    public List<StockSheet> getStockSheetList(StockMarketType marketType) throws IOException {
 
 	Path epsPath = null;
 	Path dividendPath = null;
@@ -134,10 +134,10 @@ public class CrawlerServiceImpl implements CrawlerService {
 	    Map<String, List<String>> stockDividendMap = new LinkedHashMap<>();
 
 	    List<String> epsLines = Files.readAllLines(epsPath);
-	    
+
 	    for (String line : epsLines) {
-		
-		String stockCode = StringUtils.split(line,SymbolType.COMMA.getValue())[0];
+
+		String stockCode = StringUtils.split(line, SymbolType.COMMA.getValue())[0];
 
 		if (!stockEpsMap.containsKey(stockCode)) {
 		    stockEpsMap.put(stockCode, new ArrayList<>());
@@ -145,12 +145,11 @@ public class CrawlerServiceImpl implements CrawlerService {
 		stockEpsMap.get(stockCode).add(line);
 	    }
 
-
 	    List<String> dividendLines = Files.readAllLines(dividendPath);
 
 	    for (String line : dividendLines) {
 
-		String stockCode = StringUtils.split(line,SymbolType.COMMA.getValue())[0];
+		String stockCode = StringUtils.split(line, SymbolType.COMMA.getValue())[0];
 
 		if (!stockDividendMap.containsKey(stockCode)) {
 		    stockDividendMap.put(stockCode, new ArrayList<>());
@@ -163,37 +162,38 @@ public class CrawlerServiceImpl implements CrawlerService {
 	    for (String stockCode : stockEpsMap.keySet()) {
 		List<String> epsLineList = stockEpsMap.get(stockCode);
 		List<String> dividendLineList = stockDividendMap.get(stockCode);
-		
+
 		stockSheetList.addAll(StockConverter.createStockSheetList(epsLineList, dividendLineList));
 	    }
-	    
-	    // filter 
+
+	    // filter
 	    stockSheetList = filterEmptyEPSStockSheet(stockSheetList);
 	    return stockSheetList;
 	}
 
 	return new ArrayList<>();
     }
-    
+
     /**
      * 排除舊資料
+     * 
      * @param stockSheetList
      * @return
      */
     private List<StockSheet> filterEmptyEPSStockSheet(List<StockSheet> stockSheetList) {
-	
-	return stockSheetList.stream().filter(e->{
+
+	return stockSheetList.stream().filter(e -> {
 	    return e.getEpsQ1() != null;
 	}).collect(Collectors.toList());
     }
 
     @Override
     public BigDecimal getStockPrice(String stockCode) {
-	
+
 	Crawler crawler = Crawler.createWebCrawler();
 	String stockPrice = crawler.getStockPrice(stockCode);
-	
-	if(StringUtils.isNotBlank(stockPrice) && NumberUtils.isNumber(stockPrice)) {
+
+	if (StringUtils.isNotBlank(stockPrice) && NumberUtils.isNumber(stockPrice)) {
 	    return new BigDecimal(stockPrice);
 	}
 	return BigDecimal.ZERO;

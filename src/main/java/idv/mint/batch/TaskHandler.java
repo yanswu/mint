@@ -47,10 +47,16 @@ public abstract class TaskHandler {
 	    taskExecuteConsoleLog(taskStartTime, taskEndTime);
 
 	    if (success) {
+
 		doNextHandler(context);
+		
 	    } else {
+		
+		logger.warn(this.getClass().getName()+"execute method return false !");
 	    }
 	} catch (Exception e) {
+	
+	    logger.error(e, e);
 
 	} finally {
 

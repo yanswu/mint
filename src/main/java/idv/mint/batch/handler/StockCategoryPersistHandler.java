@@ -17,7 +17,6 @@ public class StockCategoryPersistHandler extends TaskHandler {
     @Override
     public boolean execute(Context<BatchSettings, Object> context) throws Exception {
 
-	
 	CrawlerService crawlerService = getSpringBean(context, CrawlerService.class);
 	StockService stockService = getSpringBean(context, StockService.class);
 
@@ -26,6 +25,7 @@ public class StockCategoryPersistHandler extends TaskHandler {
 	for (StockMarketType marketType : marketTypeList) {
 	    
 	    List<StockCategory> stockCategoryList = crawlerService.getStockCategoryList(CrawlType.FILE, marketType);
+	    
 	    stockService.saveStockCategoryEntities(stockCategoryList);
 	}
 	
