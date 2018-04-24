@@ -37,7 +37,7 @@ public class CrawlerServiceImplTest {
 	
 	CrawlerService crawlerService = wac.getBean(CrawlerService.class);
 	
-	List<StockSheet> stockSheetList = crawlerService.getStockSheetList(CrawlType.FILE, StockMarketType.TSE);
+	List<StockSheet> stockSheetList = crawlerService.getStockSheetList( StockMarketType.TSE);
 
 	stockSheetList.stream().forEach(e -> {
 
