@@ -32,7 +32,8 @@ import idv.mint.util.stock.StockConverter;
 public class CrawlerServiceImpl implements CrawlerService {
 
     private static final Logger logger = LogManager.getLogger(CrawlerServiceImpl.class);
-
+    
+    private final static String comma = SymbolType.COMMA.getValue();
     /**
      * 
      * 
@@ -95,7 +96,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
-	return StockConverter.createStockSheetList(epsLines, dividendLines);
+	return StockConverter.createStockSheetList(epsLines, dividendLines,null,null);
     }
 
     /**
@@ -113,65 +114,66 @@ public class CrawlerServiceImpl implements CrawlerService {
 	}
 	return Crawler.createNonOpCrawler();
     }
-
+    
+    /**
+     * <pre>
+     *   key 為 stockCode 
+     * </pre>
+     * @param readPath
+     * @return
+     * @throws IOException
+     */
+    private Map<String,List<String>> convertStockCodeMap(Path readPath) throws IOException{
+    	
+    	List<String> lines = Files.readAllLines(readPath);
+    	Map<String, List<String>> map = lines.stream().collect(Collectors.groupingBy(line->{
+    		return line.split(comma)[0];
+    	}));
+    	
+    	return map;
+    	
+//    	Map<String,List<String>> map = new LinkedHashMap<>();
+//    	
+//		List<String> lines = Files.readAllLines(readPath);
+//
+//		for (String line : lines) {
+//
+//			String stockCode = StringUtils.split(line, SymbolType.COMMA.getValue())[0];
+//
+//			if (!map.containsKey(stockCode)) {
+//				map.put(stockCode, new ArrayList<>());
+//			}
+//
+//			map.get(stockCode).add(line);
+//		}
+//		return map;
+    }
+    
     @Override
     public List<StockSheet> getStockSheetList(StockMarketType marketType) throws IOException {
 
-	Path epsPath = null;
-	Path dividendPath = null;
+		Path epsPath = PathSettings.find(marketType, PathSettings.Types.EPS).getPath();
+		Path dividendPath = PathSettings.find(marketType, PathSettings.Types.DIVIDEND).getPath();
+		Path incomeStatementPath = PathSettings.find(marketType, PathSettings.Types.INCOMESTATEMENT).getPath();
+		Path balanceSheetPath = PathSettings.find(marketType, PathSettings.Types.BALANCESHEET).getPath();
+	
+	    Map<String, List<String>> stockEpsMap = convertStockCodeMap(epsPath);
+	    Map<String, List<String>> stockDividendMap = convertStockCodeMap(dividendPath);
+	    Map<String, List<String>> stockIncomeStatementMap = convertStockCodeMap(incomeStatementPath);
+	    Map<String, List<String>> stockBalanceSheetMap = convertStockCodeMap(balanceSheetPath);
 
-	if (marketType.isTSE()) {
-	    epsPath = PathSettings.STOCK_EPS_TSE_CSV.getPath();
-	    dividendPath = PathSettings.STOCK_DIVIDEND_TSE_CSV.getPath();
-	} else if (marketType.isOTC()) {
-	    epsPath = PathSettings.STOCK_EPS_OTC_CSV.getPath();
-	    dividendPath = PathSettings.STOCK_DIVIDEND_OTC_CSV.getPath();
-	}
-
-	if (epsPath != null && dividendPath != null) {
-
-	    Map<String, List<String>> stockEpsMap = new LinkedHashMap<>();
-	    Map<String, List<String>> stockDividendMap = new LinkedHashMap<>();
-
-	    List<String> epsLines = Files.readAllLines(epsPath);
-
-	    for (String line : epsLines) {
-
-		String stockCode = StringUtils.split(line, SymbolType.COMMA.getValue())[0];
-
-		if (!stockEpsMap.containsKey(stockCode)) {
-		    stockEpsMap.put(stockCode, new ArrayList<>());
-		}
-		stockEpsMap.get(stockCode).add(line);
-	    }
-
-	    List<String> dividendLines = Files.readAllLines(dividendPath);
-
-	    for (String line : dividendLines) {
-
-		String stockCode = StringUtils.split(line, SymbolType.COMMA.getValue())[0];
-
-		if (!stockDividendMap.containsKey(stockCode)) {
-		    stockDividendMap.put(stockCode, new ArrayList<>());
-		}
-		stockDividendMap.get(stockCode).add(line);
-	    }
-
-	    List<StockSheet> stockSheetList = new ArrayList<>();
-
-	    for (String stockCode : stockEpsMap.keySet()) {
-		List<String> epsLineList = stockEpsMap.get(stockCode);
-		List<String> dividendLineList = stockDividendMap.get(stockCode);
-
-		stockSheetList.addAll(StockConverter.createStockSheetList(epsLineList, dividendLineList));
-	    }
-
+	    
+	    return stockEpsMap.entrySet().stream().flatMap(e->{
+	    	String stockCode = e.getKey();
+	    	List<String> epsLines = e.getValue();
+	    	List<String> dividendLines = stockDividendMap.get(stockCode);
+	    	List<String> incomeStatementLines = stockIncomeStatementMap.get(stockCode);
+	    	List<String> balanceSheetLines = stockBalanceSheetMap.get(stockCode);
+	    	return StockConverter.createStockSheetList(epsLines, dividendLines,incomeStatementLines,balanceSheetLines).stream();
+	    }).collect(Collectors.toList());
+	    
 	    // filter
-	    stockSheetList = filterEmptyEPSStockSheet(stockSheetList);
-	    return stockSheetList;
-	}
 
-	return new ArrayList<>();
     }
 
     /**

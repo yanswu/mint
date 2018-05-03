@@ -1,4 +1,4 @@
-package idv.mint.batch.handler;
+package idv.mint.batch.handler.csv;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,9 +8,8 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import idv.mint.batch.BatchSettings;
 import idv.mint.batch.Context;
-import idv.mint.batch.TaskHandler;
+import idv.mint.batch.handler.TaskHandler;
 import idv.mint.bean.Stock;
 import idv.mint.support.PathSettings;
 import idv.mint.util.FileUtils;
@@ -21,7 +20,7 @@ import idv.mint.util.stock.StockConverter;
 public class StockPriceHistoryCsvHandler extends TaskHandler {
 
     @Override
-    public boolean execute(Context<BatchSettings, Object> context) throws Exception {
+    public boolean execute(Context<Context.Constants, Object> context) throws Exception {
 	
 	priceHistoryCsvWriter(PathSettings.STOCK_TSE_CSV, PathSettings.STOCK_PRICE_HISTORY_TSE_CSV);
 

@@ -1,44 +1,47 @@
-package idv.mint.batch.handler;
+package idv.mint.batch.handler.csv;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import idv.mint.batch.BatchSettings;
+import idv.mint.batch.BatchContextUtils;
 import idv.mint.batch.Context;
-import idv.mint.batch.TaskHandler;
+import idv.mint.batch.handler.TaskHandler;
 import idv.mint.entity.enums.StockMarketType;
 import idv.mint.support.PathSettings;
 import idv.mint.util.FileUtils;
 import idv.mint.util.crawl.Crawler;
 
 public class StockCategoryCsvHandler extends TaskHandler {
-    
-    
-    public StockCategoryCsvHandler() {}
-    
+
+    public StockCategoryCsvHandler() {
+    }
+
     public StockCategoryCsvHandler(TaskHandler next) {
 	super(next);
     }
 
     @Override
-    public boolean execute(Context<BatchSettings, Object> context) throws Exception{
+    public boolean execute(Context<Context.Constants, Object> context) throws Exception {
 	
-	try {
-
-	    stockCategoryCsvWriter(StockMarketType.TSE, PathSettings.STOCK_CATEGORY_TSE_CSV);
+	Map<StockMarketType, PathSettings> map = new LinkedHashMap<>();
+	map.put(StockMarketType.TSE, PathSettings.STOCK_CATEGORY_TSE_CSV);
+	map.put(StockMarketType.OTC, PathSettings.STOCK_CATEGORY_OTC_CSV);
+	
+	List<StockMarketType> stockMarketType = BatchContextUtils.getStockMarketType(context);
+	
+	for (StockMarketType marketType : stockMarketType) {
 	    
-	    stockCategoryCsvWriter(StockMarketType.OTC, PathSettings.STOCK_CATEGORY_OTC_CSV);
+	    PathSettings writePath = map.get(marketType);
 	    
-	} catch (IOException e) {
-	    
-	    logger.error(e.getMessage());
-	    
-	    return false;
+	    stockCategoryCsvWriter(marketType, writePath);
 	}
 
 	return true;
     }
+    
 
     private void stockCategoryCsvWriter(StockMarketType marketType, PathSettings inPathSettings) throws IOException {
 
@@ -46,7 +49,7 @@ public class StockCategoryCsvHandler extends TaskHandler {
 
 	// 1. parser HTML
 	Crawler crawler = Crawler.createWebCrawler();
-	
+
 	List<String> lines = crawler.getStockCategoryLines(marketType);
 
 	// 2. clean file content
@@ -55,7 +58,5 @@ public class StockCategoryCsvHandler extends TaskHandler {
 	// 3. write files
 	FileUtils.writeFile(writePath, lines);
     }
-
-
 
 }

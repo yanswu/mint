@@ -84,128 +84,144 @@ public class StockServiceImpl implements StockService {
     @Override
     public void saveStockSheetEntities(List<StockSheet> stockSheetList) {
 
-	if (CollectionUtils.isNotEmpty(stockSheetList)) {
+		if (CollectionUtils.isNotEmpty(stockSheetList)) {
 
-	    stockSheetList.stream().forEach(stockSheet -> {
+			LocalDateTime now = LocalDateTime.now();
 
-		LocalDate baseDate = stockSheet.getBaseDate();
-		String stockCode = stockSheet.getStockCode();
+			stockSheetList.stream()
+					.forEach(stockSheet -> {
 
-		StockSheetPk stockSheetPk = new StockSheetPk(stockCode, baseDate);
+						LocalDate baseDate = stockSheet.getBaseDate();
+						String stockCode = stockSheet.getStockCode();
 
-		StockSheetEntity entity = new StockSheetEntity();
-		entity.setSheetPk(stockSheetPk);
-		entity.setEpsQ1(stockSheet.getEpsQ1());
-		entity.setEpsQ2(stockSheet.getEpsQ2());
-		entity.setEpsQ3(stockSheet.getEpsQ3());
-		entity.setEpsQ4(stockSheet.getEpsQ4());
-		entity.setStockDividend(stockSheet.getStockDividend());
-		entity.setCashDividend(stockSheet.getCashDividend());
-		entity.setInsertTime(LocalDateTime.now());
-		stockSheetDao.persist(entity);
-	    });
+						StockSheetPk stockSheetPk = new StockSheetPk(stockCode, baseDate);
+
+						StockSheetEntity entity = new StockSheetEntity();
+						entity.setSheetPk(stockSheetPk);
+						entity.setEpsQ1(stockSheet.getEpsQ1());
+						entity.setEpsQ2(stockSheet.getEpsQ2());
+						entity.setEpsQ3(stockSheet.getEpsQ3());
+						entity.setEpsQ4(stockSheet.getEpsQ4());
+						entity.setStockDividend(stockSheet.getStockDividend());
+						entity.setCashDividend(stockSheet.getCashDividend());
+						entity.setNetIncome(stockSheet.getNetIncome());
+						entity.setLongTermInvest(stockSheet.getLongTermInvest());
+						entity.setFixedAsset(stockSheet.getFixedAsset());
+						entity.setShareholderEquity(stockSheet.getShareholderEquity());
+						entity.setInsertTime(now);
+						stockSheetDao.persist(entity);
+					});
+		}
 	}
-    }
 
     @Transactional
     @Override
     public void saveStockCategoryEntities(List<StockCategory> list) {
 
-	if (CollectionUtils.isNotEmpty(list)) {
+		if (CollectionUtils.isNotEmpty(list)) {
 
-	    // AtomicInteger index = new AtomicInteger();
-	    // index.incrementAndGet();
-	    List<StockCategoryEntity> entityList = list.stream().map(category -> {
+			// AtomicInteger index = new AtomicInteger();
+			// index.incrementAndGet();
+			List<StockCategoryEntity> entityList = list.stream()
+					.map(category -> {
 
-		StockCategoryEntity entity = new StockCategoryEntity();
+						StockCategoryEntity entity = new StockCategoryEntity();
 
-		entity.setMarketType(category.getMarketType().getValue());
-		entity.setOrderNo(category.getOrderNo());
-		entity.setCategoryName(category.getName());
-		entity.setStockCategoryId(category.getStockCategoryId());
+						entity.setMarketType(category.getMarketType().getValue());
+						entity.setOrderNo(category.getOrderNo());
+						entity.setCategoryName(category.getName());
+						entity.setStockCategoryId(category.getStockCategoryId());
 
-		return entity;
+						return entity;
 
-	    }).collect(Collectors.toList());
+					})
+					.collect(Collectors.toList());
 
-	    entityList.stream().forEach(entity -> {
-		stockCategoryDao.persist(entity);
-	    });
+			entityList.stream()
+					.forEach(entity -> {
+						stockCategoryDao.persist(entity);
+					});
+		}
 	}
-    }
 
     @Override
-    public Stock getStock(String stockCode) {
+	public Stock getStock(String stockCode) {
 
-	if (StringUtils.isBlank(stockCode)) {
-	    return null;
+		if (StringUtils.isBlank(stockCode)) {
+			return null;
+		}
+
+		StockEntity stockEntity = stockDao.getByKey(stockCode);
+
+		if (stockEntity == null) {
+			return null;
+		}
+
+		// 1. create stock
+		Stock stock = new Stock();
+		stock.setStockCode(stockEntity.getStockCode());
+		stock.setStockName(stockEntity.getStockName());
+
+		// 2. create stockCategory
+		StockCategory stockCategory = new StockCategory();
+
+		String stockCategoryId = stockEntity.getStockCategoryId();
+		StockCategoryEntity stockCategoryEntity = stockCategoryDao.getByKey(stockCategoryId);
+
+		if (stockCategoryEntity != null) {
+			stockCategory.setMarketType(StockMarketType.find(stockCategoryEntity.getMarketType()));
+			stockCategory.setOrderNo(stockCategoryEntity.getOrderNo());
+			stockCategory.setName(stockCategoryEntity.getCategoryName());
+			stockCategory.setStockCategoryId(stockCategoryId);
+		}
+
+		stock.setStockCategory(stockCategory);
+
+		// 3. create stockSheetList
+		List<StockSheetEntity> stockSheetEntityList = stockSheetDao.findByStockId(stockCode);
+
+		List<StockSheet> stockSheetList = new ArrayList<>();
+
+		if (CollectionUtils.isNotEmpty(stockSheetEntityList)) {
+
+			stockSheetList = stockSheetEntityList.stream()
+					.map(entity -> {
+
+						StockSheet stockSheet = new StockSheet();
+						stockSheet.setBaseDate(entity.getSheetPk()
+								.getCalYear());
+
+						BigDecimal epsQ1 = entity.getEpsQ1();
+						BigDecimal epsQ2 = entity.getEpsQ2();
+						BigDecimal epsQ3 = entity.getEpsQ3();
+						BigDecimal epsQ4 = entity.getEpsQ4();
+						BigDecimal totalEps = Arrays.asList(epsQ1, epsQ2, epsQ3, epsQ4)
+								.stream()
+								.filter(Objects::nonNull)
+								.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+						stockSheet.setEpsQ1(epsQ1);
+						stockSheet.setEpsQ2(epsQ2);
+						stockSheet.setEpsQ3(epsQ3);
+						stockSheet.setEpsQ4(epsQ4);
+						stockSheet.setTotalEps(totalEps);
+
+						stockSheet.setCashDividend(entity.getCashDividend());
+						stockSheet.setStockDividend(entity.getStockDividend());
+
+						return stockSheet;
+
+					})
+					.collect(Collectors.toList());
+		}
+
+		// 計算還原股價
+		BigDecimal stockPrice = crawlerService.getStockPrice(stockCode);
+		StockUtils.calculateValuePrice(stockPrice, stockSheetList);
+		stock.setStockSheetList(stockSheetList);
+
+		return stock;
 	}
-
-	StockEntity stockEntity = stockDao.getByKey(stockCode);
-
-	if (stockEntity == null) {
-	    return null;
-	}
-
-	// 1. create stock
-	Stock stock = new Stock();
-	stock.setStockCode(stockEntity.getStockCode());
-	stock.setStockName(stockEntity.getStockName());
-
-	// 2. create stockCategory
-	StockCategory stockCategory = new StockCategory();
-
-	String stockCategoryId = stockEntity.getStockCategoryId();
-	StockCategoryEntity stockCategoryEntity = stockCategoryDao.getByKey(stockCategoryId);
-
-	if (stockCategoryEntity != null) {
-	    stockCategory.setMarketType(StockMarketType.find(stockCategoryEntity.getMarketType()));
-	    stockCategory.setOrderNo(stockCategoryEntity.getOrderNo());
-	    stockCategory.setName(stockCategoryEntity.getCategoryName());
-	    stockCategory.setStockCategoryId(stockCategoryId);
-	}
-
-	stock.setStockCategory(stockCategory);
-
-	// 3. create stockSheetList
-	List<StockSheetEntity> stockSheetEntityList = stockSheetDao.findByStockId(stockCode);
-
-	List<StockSheet> stockSheetList = new ArrayList<>();
-
-	if (CollectionUtils.isNotEmpty(stockSheetEntityList)) {
-
-	    stockSheetList = stockSheetEntityList.stream().map(entity -> {
-
-		StockSheet stockSheet = new StockSheet();
-		stockSheet.setBaseDate(entity.getSheetPk().getCalYear());
-
-		BigDecimal epsQ1 = entity.getEpsQ1();
-		BigDecimal epsQ2 = entity.getEpsQ2();
-		BigDecimal epsQ3 = entity.getEpsQ3();
-		BigDecimal epsQ4 = entity.getEpsQ4();
-		BigDecimal totalEps = Arrays.asList(epsQ1,epsQ2,epsQ3,epsQ4).stream().filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-		
-		stockSheet.setEpsQ1(epsQ1);
-		stockSheet.setEpsQ2(epsQ2);
-		stockSheet.setEpsQ3(epsQ3);
-		stockSheet.setEpsQ4(epsQ4);
-		stockSheet.setTotalEps(totalEps);
-		
-		stockSheet.setCashDividend(entity.getCashDividend());
-		stockSheet.setStockDividend(entity.getStockDividend());
-		
-		return stockSheet;
-
-	    }).collect(Collectors.toList());
-	}
-
-	// 計算還原股價
-	BigDecimal stockPrice = crawlerService.getStockPrice(stockCode);
-	StockUtils.calculateValuePrice(stockPrice,stockSheetList);
-	stock.setStockSheetList(stockSheetList);
-
-	return stock;
-    }
 
     @Transactional
     @Override
@@ -219,32 +235,32 @@ public class StockServiceImpl implements StockService {
 
 	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
 
-	if (entity == null) {
-	    stockSheetDao.persist(entity);
-	} else {
-	    stockSheetDao.updateLastestEPS(stockSheet);
+		if (entity == null) {
+			stockSheetDao.persist(entity);
+		} else {
+			stockSheetDao.updateLastestEPS(stockSheet);
+		}
 	}
-    }
 
     @Transactional
     @Override
     public void updateLastestDividend(String stockCode) throws IOException {
 
-	Crawler crawler = Crawler.createWebCrawler();
+		Crawler crawler = Crawler.createWebCrawler();
 
-	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
+		List<String> dividendLines = crawler.getStockDividendLines(stockCode);
 
-	String lastLine = dividendLines.get(0);
+		String lastLine = dividendLines.get(0);
 
-	StockSheet stockSheet = StockConverter.createStockSheetDividend(lastLine);
+		StockSheet stockSheet = StockConverter.createStockSheetDividend(lastLine);
 
-	StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
+		StockSheetEntity entity = stockSheetDao.findByPk(stockSheet.getStockCode(), stockSheet.getBaseDate());
 
-	if (entity == null) {
-	    this.saveStockSheet(stockSheet);
-	} else {
-	    stockSheetDao.updateLastestDividend(stockSheet);
+		if (entity == null) {
+			this.saveStockSheet(stockSheet);
+		} else {
+			stockSheetDao.updateLastestDividend(stockSheet);
+		}
 	}
-    }
 
 }

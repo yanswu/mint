@@ -10,7 +10,7 @@ import idv.mint.context.config.AppConfig;
 import idv.mint.context.config.JpaConfig;
 import idv.mint.entity.enums.StockMarketType;
 
-public class ContextParamUtils {
+public class BatchContextUtils {
 
     public static AnnotationConfigApplicationContext createSpringApplicationContext() {
 
@@ -20,35 +20,35 @@ public class ContextParamUtils {
 	return context;
     }
 
-    public static Context<BatchSettings, Object> createContext() {
+    public static Context<Context.Constants, Object> createContext() {
 
-	Context<BatchSettings, Object> context = new Context<>();
+	Context<Context.Constants, Object> context = new Context<>();
 	return context;
     }
 
-    public static Context<BatchSettings, Object> createContextWithSpringConfig() {
+    public static Context<Context.Constants, Object> createContextWithSpringConfig() {
 
-	Context<BatchSettings, Object> context = new Context<>();
-	context.put(BatchSettings.SPRING_APP_CONTEXT, createSpringApplicationContext());
+	Context<Context.Constants, Object> context = new Context<>();
+	context.put(Context.Constants.SPRING_APP_CONTEXT, createSpringApplicationContext());
 	return context;
     }
 
-    public static Optional<List<StockMarketType>> getStockMarketType(Context<BatchSettings, Object> context) {
+    public static List<StockMarketType> getStockMarketType(Context<Context.Constants, Object> context) {
 
-	Object marketTypeObj = context.get(BatchSettings.MARKET_TYPE);
+	Object marketTypeObj = context.get(Context.Constants.MARKET_TYPE);
 
 	if (marketTypeObj == null) {
-	    return Optional.of(Arrays.asList(StockMarketType.TSE,StockMarketType.OTC));
+	    return Arrays.asList(StockMarketType.TSE,StockMarketType.OTC);
 	}
 	
 	StockMarketType marketType = (StockMarketType) marketTypeObj;
 	
-	return Optional.of(Arrays.asList(marketType));
+	return Arrays.asList(marketType);
     }
 
-    public static Optional<AnnotationConfigApplicationContext> getSpringAppContext(Context<BatchSettings, Object> context) {
+    public static Optional<AnnotationConfigApplicationContext> getSpringAppContext(Context<Context.Constants, Object> context) {
 
-	Object springContextObj = context.get(BatchSettings.SPRING_APP_CONTEXT);
+	Object springContextObj = context.get(Context.Constants.SPRING_APP_CONTEXT);
 
 	if (springContextObj == null) {
 	    return Optional.empty();
@@ -59,9 +59,9 @@ public class ContextParamUtils {
 	return Optional.of(springContext);
     }
 
-    public static Optional<String> getStockCode(Context<BatchSettings, Object> context) {
+    public static Optional<String> getStockCode(Context<Context.Constants, Object> context) {
 
-	Object stockCodeObj = context.get(BatchSettings.STOCK_CODE);
+	Object stockCodeObj = context.get(Context.Constants.STOCK_CODE);
 
 	if (stockCodeObj == null) {
 	    return Optional.empty();

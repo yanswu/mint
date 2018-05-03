@@ -1,16 +1,14 @@
-package idv.mint.batch.handler;
+package idv.mint.batch.handler.csv;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import idv.mint.batch.BatchSettings;
 import idv.mint.batch.Context;
-import idv.mint.batch.TaskHandler;
+import idv.mint.batch.handler.TaskHandler;
 import idv.mint.bean.StockCategory;
 import idv.mint.context.enums.SymbolType;
 import idv.mint.entity.enums.StockMarketType;
@@ -29,7 +27,7 @@ public class StockCsvHandler extends TaskHandler {
     };
 
     @Override
-    public boolean execute(Context<BatchSettings, Object> context) throws Exception {
+    public boolean execute(Context<Context.Constants, Object> context) throws Exception {
 
 	try {
 

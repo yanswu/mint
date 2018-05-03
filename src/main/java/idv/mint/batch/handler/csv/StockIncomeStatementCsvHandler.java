@@ -1,4 +1,4 @@
-package idv.mint.batch.handler;
+package idv.mint.batch.handler.csv;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -6,9 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import idv.mint.batch.BatchSettings;
 import idv.mint.batch.Context;
-import idv.mint.batch.TaskHandler;
+import idv.mint.batch.handler.TaskHandler;
 import idv.mint.bean.Stock;
 import idv.mint.support.PathSettings;
 import idv.mint.util.FileUtils;
@@ -18,7 +17,7 @@ import idv.mint.util.stock.StockConverter;
 public class StockIncomeStatementCsvHandler extends TaskHandler {
 
     @Override
-    public boolean execute(Context<BatchSettings, Object> context) throws Exception {
+    public boolean execute(Context<Context.Constants, Object> context) throws Exception {
 
 	// TSE
 	incomeStatementCsvWriter(PathSettings.STOCK_TSE_CSV, PathSettings.STOCK_INCOMESTATEMENT_TSE_CSV);

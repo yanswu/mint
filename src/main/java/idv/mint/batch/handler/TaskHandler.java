@@ -1,4 +1,4 @@
-package idv.mint.batch;
+package idv.mint.batch.handler;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -8,6 +8,9 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import idv.mint.batch.BatchContextUtils;
+import idv.mint.batch.Context;
 
 public abstract class TaskHandler {
 
@@ -32,9 +35,9 @@ public abstract class TaskHandler {
 	this.next = next;
     }
 
-    public abstract boolean execute(Context<BatchSettings, Object> context) throws Exception;
+    public abstract boolean execute(Context<Context.Constants, Object> context) throws Exception;
 
-    public void executeTask(Context<BatchSettings, Object> context) {
+    public void executeTask(Context<Context.Constants, Object> context) {
 
 	try {
 
@@ -60,7 +63,7 @@ public abstract class TaskHandler {
 
 	} finally {
 
-	    Optional<AnnotationConfigApplicationContext> springContextOptional = ContextParamUtils.getSpringAppContext(context);
+	    Optional<AnnotationConfigApplicationContext> springContextOptional = BatchContextUtils.getSpringAppContext(context);
 	    if (springContextOptional.isPresent()) {
 		AnnotationConfigApplicationContext springContext = springContextOptional.get();
 		springContext.close();
@@ -68,16 +71,16 @@ public abstract class TaskHandler {
 	}
     }
 
-    protected void doNextHandler(Context<BatchSettings, Object> context) {
+    protected void doNextHandler(Context<Context.Constants, Object> context) {
 
 	if (next != null) {
 	    next.executeTask(context);
 	}
     }
 
-    protected <T> T getSpringBean(Context<BatchSettings, Object> context, Class<T> clazz) {
+    protected <T> T getSpringBean(Context<Context.Constants, Object> context, Class<T> clazz) {
 
-	return ContextParamUtils.getSpringAppContext(context).get().getBean(clazz);
+	return BatchContextUtils.getSpringAppContext(context).get().getBean(clazz);
     }
 
     private static void taskExecuteConsoleLog(LocalDateTime startTime, LocalDateTime endTime) {
