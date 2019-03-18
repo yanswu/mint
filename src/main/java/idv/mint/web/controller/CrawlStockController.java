@@ -22,56 +22,55 @@ import idv.mint.service.CrawlerService;
 import idv.mint.type.CrawlType;
 
 @RestController
-@RequestMapping(value="/crawl/stock")
+@RequestMapping(value = "/crawl/stock")
 public class CrawlStockController {
 
-    private static final Logger logger = LogManager.getLogger(CrawlStockController.class);
+	private static final Logger logger = LogManager.getLogger(CrawlStockController.class);
 
-    @Autowired
-    CrawlerService crawlService;
-    
-    @RequestMapping(value = { "/category/{marketType}" }, method = RequestMethod.GET)
-    public ResponseEntity<List<StockCategory>> getStockCategory(@PathVariable String marketType) {
+	@Autowired
+	CrawlerService crawlService;
 
-	try {
-	    if (StringUtils.isNotBlank(marketType) && StringUtils.isNumeric(marketType)) {
-		StockMarketType stockMarketType = StockMarketType.find(Integer.parseInt(marketType));
-		if (!stockMarketType.isUnknown()) {
-		    List<StockCategory> categories = crawlService.getStockCategoryList(CrawlType.ONLINE,stockMarketType);
-		    return new ResponseEntity<List<StockCategory>>(categories,HttpStatus.OK);
+	@RequestMapping(value = { "/category/{marketType}" }, method = RequestMethod.GET)
+	public ResponseEntity<List<StockCategory>> getStockCategory(@PathVariable String marketType) {
+
+		try {
+			if (StringUtils.isNotBlank(marketType) && StringUtils.isNumeric(marketType)) {
+				StockMarketType stockMarketType = StockMarketType.find(Integer.parseInt(marketType));
+				if (!stockMarketType.isUnknown()) {
+					List<StockCategory> categories = crawlService.getStockCategoryList(CrawlType.ONLINE, stockMarketType);
+					return new ResponseEntity<List<StockCategory>>(categories, HttpStatus.OK);
+				}
+			}
+		} catch (IOException e) {
+			logger.error(e, e);
 		}
-	    }
-	} catch (IOException e) {
-	    logger.error(e, e);
+		return new ResponseEntity<List<StockCategory>>(HttpStatus.NOT_FOUND);
 	}
-	return new ResponseEntity<List<StockCategory>>(HttpStatus.NOT_FOUND);
-    }
 
-    @RequestMapping(value = { "/allCategories" }, method = RequestMethod.GET)
-    public ResponseEntity<List<StockCategory>> getAllStockCategories() {
-	
-	try {
-	    List<StockCategory> categories = crawlService.getAllStockCategories(CrawlType.ONLINE) ;
-	    return new ResponseEntity<List<StockCategory>>(categories,HttpStatus.OK);
-	} catch (IOException e) {
-	    logger.error(e, e);
-	}
-	return new ResponseEntity<List<StockCategory>>(HttpStatus.NOT_FOUND);
-    }
-    
+	@RequestMapping(value = { "/allCategories" }, method = RequestMethod.GET)
+	public ResponseEntity<List<StockCategory>> getAllStockCategories() {
 
-    @RequestMapping(value = { "/sheet/{stockCode}" }, method = RequestMethod.GET)
-    public ResponseEntity<List<StockSheet>> getStockSheet(@PathVariable String stockCode){
-	
-	try {
-	    List<StockSheet> stockSheetList = crawlService.getStockSheetList(CrawlType.FILE,stockCode);
-	    if(!CollectionUtils.isEmpty(stockSheetList)) {
-		return new ResponseEntity<List<StockSheet>>(stockSheetList,HttpStatus.OK);
-	    }
-	} catch (Exception e) {
-	    logger.error(e, e);
+		try {
+			List<StockCategory> categories = crawlService.getAllStockCategories(CrawlType.ONLINE);
+			return new ResponseEntity<List<StockCategory>>(categories, HttpStatus.OK);
+		} catch (IOException e) {
+			logger.error(e, e);
+		}
+		return new ResponseEntity<List<StockCategory>>(HttpStatus.NOT_FOUND);
 	}
-	return new ResponseEntity<List<StockSheet>>(HttpStatus.NOT_FOUND);
-    }
+
+	@RequestMapping(value = { "/sheet/{stockCode}" }, method = RequestMethod.GET)
+	public ResponseEntity<List<StockSheet>> getStockSheet(@PathVariable String stockCode) {
+
+		try {
+			List<StockSheet> stockSheetList = crawlService.getStockSheetList(CrawlType.FILE, stockCode);
+			if (!CollectionUtils.isEmpty(stockSheetList)) {
+				return new ResponseEntity<List<StockSheet>>(stockSheetList, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			logger.error(e, e);
+		}
+		return new ResponseEntity<List<StockSheet>>(HttpStatus.NOT_FOUND);
+	}
 
 }

@@ -6,10 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -57,15 +59,19 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Override
     public List<StockCategory> getAllStockCategories(CrawlType crawlType) throws IOException {
 
-	return Arrays.asList(StockMarketType.TSE, StockMarketType.OTC).stream().flatMap(marketType -> {
-	    try {
-		return this.getStockCategoryList(crawlType, marketType).stream();
-	    } catch (IOException e) {
-		logger.error(e, e);
-		throw new RuntimeException(e);
-	    }
-	}).collect(Collectors.toList());
-    }
+		return Arrays.asList(StockMarketType.TSE, StockMarketType.OTC)
+				.stream()
+				.flatMap(marketType -> {
+					try {
+						return this.getStockCategoryList(crawlType, marketType)
+								.stream();
+					} catch (IOException e) {
+						logger.error(e, e);
+						throw new RuntimeException(e);
+					}
+				})
+				.collect(Collectors.toList());
+	}
 
     @Override
     public List<Stock> getStockList(CrawlType crawlType, StockMarketType marketType) throws IOException {
@@ -95,6 +101,8 @@ public class CrawlerServiceImpl implements CrawlerService {
 	List<String> epsLines = crawler.getStockEPSLines(stockCode);
 
 	List<String> dividendLines = crawler.getStockDividendLines(stockCode);
+	
+	
 
 	return StockConverter.createStockSheetList(epsLines, dividendLines,null,null);
     }
@@ -182,23 +190,25 @@ public class CrawlerServiceImpl implements CrawlerService {
      * @param stockSheetList
      * @return
      */
-    private List<StockSheet> filterEmptyEPSStockSheet(List<StockSheet> stockSheetList) {
+	private List<StockSheet> filterEmptyEPSStockSheet(List<StockSheet> stockSheetList) {
 
-	return stockSheetList.stream().filter(e -> {
-	    return e.getEpsQ1() != null;
-	}).collect(Collectors.toList());
-    }
-
-    @Override
-    public BigDecimal getStockPrice(String stockCode) {
-
-	Crawler crawler = Crawler.createWebCrawler();
-	String stockPrice = crawler.getStockPrice(stockCode);
-
-	if (StringUtils.isNotBlank(stockPrice) && NumberUtils.isNumber(stockPrice)) {
-	    return new BigDecimal(stockPrice);
+		return stockSheetList.stream()
+				.filter(e -> {
+					return e.getEpsQ1() != null;
+				})
+				.collect(Collectors.toList());
 	}
-	return BigDecimal.ZERO;
-    }
+
+	@Override
+	public BigDecimal getStockPrice(String stockCode) {
+
+		Crawler crawler = Crawler.createWebCrawler();
+		String stockPrice = crawler.getStockPrice(stockCode);
+
+		if (StringUtils.isNotBlank(stockPrice) && NumberUtils.isNumber(stockPrice)) {
+			return new BigDecimal(stockPrice);
+		}
+		return BigDecimal.ZERO;
+	}
 
 }

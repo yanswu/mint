@@ -315,69 +315,71 @@ public class WebCrawler implements Crawler {
 	return new ArrayList<>();
     }
 
-    public List<String> getIncomeStatementLines(String stockCode, Integer reTryTimes) throws IOException {
+	public List<String> getIncomeStatementLines(String stockCode, Integer reTryTimes) throws IOException {
 
-	// 年合併損益表
-	String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcq/zcqa/zcqa_%s.djhtm";
+		// 年合併損益表
+		String urlTemplate = "http://justdata.yuanta.com.tw/z/zc/zcq/zcqa/zcqa_%s.djhtm";
 
-	String url = String.format(urlTemplate, stockCode);
-
-	try {
-
-	    Document document = JsoupUtils.getDocument(url);
-	    // logger.debug(document.toString());
-	    Elements elements = document.select("table.t01 >tbody tr");
-
-	    // rocYear
-	    Elements yearTDList = elements.get(1).select("td");
-	    // netIncome
-	    Elements netIncomeTDList = elements.get(49).select("td");
-
-	    List<String> lines = new ArrayList<>();
-
-	    for (int i = 1; i < yearTDList.size(); i++) {
-		String rocYear = yearTDList.get(i).text();
-		// 2,100 --> 2100
-		String netIncome = StringUtils.remove(netIncomeTDList.get(i).text(), comma);
-		String line = String.join(comma, stockCode, rocYear, netIncome);
-		lines.add(line);
-	    }
-	    return lines;
-
-	} catch (Exception e) {
-
-	    logger.error(url, e);
-
-	    if (reTryTimes > 1) {
+		String url = String.format(urlTemplate, stockCode);
 
 		try {
 
-		    Thread.sleep(new Random().nextInt(9) * 1000);
+			Document document = JsoupUtils.getDocument(url);
+			// logger.debug(document.toString());
+			Elements elements = document.select("table.t01 >tbody tr");
 
-		} catch (InterruptedException e1) {
+			// rocYear
+			Elements yearTDList = elements.get(1)
+					.select("td");
+			// netIncome
+			Elements netIncomeTDList = elements.get(49)
+					.select("td");
 
-		    e1.printStackTrace();
+			List<String> lines = new ArrayList<>();
+
+			for (int i = 1; i < yearTDList.size(); i++) {
+				String rocYear = yearTDList.get(i).text();
+				// 2,100 --> 2100
+				String netIncome = StringUtils.remove(netIncomeTDList.get(i).text(), comma);
+				String line = String.join(comma, stockCode, rocYear, netIncome);
+				lines.add(line);
+			}
+			return lines;
+
+		} catch (Exception e) {
+
+			logger.error(url, e);
+
+			if (reTryTimes > 1) {
+
+				try {
+
+					Thread.sleep(new Random().nextInt(9) * 1000);
+
+				} catch (InterruptedException e1) {
+
+					e1.printStackTrace();
+				}
+
+				return getIncomeStatementLines(stockCode, reTryTimes - 1);
+			}
 		}
 
-		return getIncomeStatementLines(stockCode, reTryTimes - 1);
-	    }
+		writeErrorLogFile(url);
+
+		return new ArrayList<>();
 	}
-
-	writeErrorLogFile(url);
-
-	return new ArrayList<>();
-    }
 
     @Override
     public List<String> getBalanceSheetLines(String stockCode) {
 
-	try {
-	    return getBalanceSheetLines(stockCode, RETRY_TIMES);
-	} catch (IOException e) {
-	    e.printStackTrace();
+		try {
+			return getBalanceSheetLines(stockCode, RETRY_TIMES);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<>();
 	}
-	return new ArrayList<>();
-    }
 
     public List<String> getBalanceSheetLines(String stockCode, int reTryTimes) throws IOException {
 
@@ -405,13 +407,14 @@ public class WebCrawler implements Crawler {
 	    List<String> lines = new ArrayList<>();
 
 	    for (int i = 1; i < yearTDList.size(); i++) {
-		String rocYear = yearTDList.get(i).text();
-		// 2,100 --> 2100
-		String longTermInvest = StringUtils.remove(longTermInvestTDList.get(i).text(), comma);
-		String fixedAsset = StringUtils.remove(fixedAssetTDList.get(i).text(), comma);
-		String shareHolderEquity = StringUtils.remove(shareholderEquityTDList.get(i).text(), comma);
-		String line = String.join(comma, stockCode, rocYear, longTermInvest, fixedAsset, shareHolderEquity);
-		lines.add(line);
+	    	
+			String rocYear = yearTDList.get(i).text();
+			// 2,100 --> 2100
+			String longTermInvest = StringUtils.remove(longTermInvestTDList.get(i).text(), comma);
+			String fixedAsset = StringUtils.remove(fixedAssetTDList.get(i).text(), comma);
+			String shareHolderEquity = StringUtils.remove(shareholderEquityTDList.get(i).text(), comma);
+			String line = String.join(comma, stockCode, rocYear, longTermInvest, fixedAsset, shareHolderEquity);
+			lines.add(line);
 	    }
 
 	    return lines;
@@ -423,8 +426,8 @@ public class WebCrawler implements Crawler {
 	    if (reTryTimes > 1) {
 
 		try {
-
-		    Thread.sleep(new Random().nextInt(9) * 1000);
+			TimeUnit.SECONDS.sleep(2);
+//		    Thread.sleep(new Random().nextInt(9) * 1000);
 
 		} catch (InterruptedException e1) {
 

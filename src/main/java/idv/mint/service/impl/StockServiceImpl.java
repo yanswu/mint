@@ -2,6 +2,7 @@ package idv.mint.service.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -158,15 +159,13 @@ public class StockServiceImpl implements StockService {
 		}
 
 		// 1. create stock
-		Stock stock = new Stock();
-		stock.setStockCode(stockEntity.getStockCode());
-		stock.setStockName(stockEntity.getStockName());
+		Stock stock = new Stock(stockEntity.getStockCode(),stockEntity.getStockName());
 
 		// 2. create stockCategory
-		StockCategory stockCategory = new StockCategory();
-
 		String stockCategoryId = stockEntity.getStockCategoryId();
 		StockCategoryEntity stockCategoryEntity = stockCategoryDao.getByKey(stockCategoryId);
+		
+		StockCategory stockCategory = new StockCategory();
 
 		if (stockCategoryEntity != null) {
 			stockCategory.setMarketType(StockMarketType.find(stockCategoryEntity.getMarketType()));
@@ -188,13 +187,13 @@ public class StockServiceImpl implements StockService {
 					.map(entity -> {
 
 						StockSheet stockSheet = new StockSheet();
-						stockSheet.setBaseDate(entity.getSheetPk()
-								.getCalYear());
+						stockSheet.setBaseDate(entity.getSheetPk().getCalYear());
 
 						BigDecimal epsQ1 = entity.getEpsQ1();
 						BigDecimal epsQ2 = entity.getEpsQ2();
 						BigDecimal epsQ3 = entity.getEpsQ3();
 						BigDecimal epsQ4 = entity.getEpsQ4();
+						
 						BigDecimal totalEps = Arrays.asList(epsQ1, epsQ2, epsQ3, epsQ4)
 								.stream()
 								.filter(Objects::nonNull)
@@ -206,8 +205,12 @@ public class StockServiceImpl implements StockService {
 						stockSheet.setEpsQ4(epsQ4);
 						stockSheet.setTotalEps(totalEps);
 
-						stockSheet.setCashDividend(entity.getCashDividend());
-						stockSheet.setStockDividend(entity.getStockDividend());
+						stockSheet.setCashDividend(entity.getCashDividend().setScale(2, RoundingMode.DOWN));
+						stockSheet.setStockDividend(entity.getStockDividend().setScale(2, RoundingMode.DOWN));
+						stockSheet.setLongTermInvest(entity.getLongTermInvest());
+						stockSheet.setShareholderEquity(entity.getShareholderEquity());
+						stockSheet.setNetIncome(entity.getNetIncome());
+						stockSheet.setFixedAsset(entity.getFixedAsset());
 
 						return stockSheet;
 

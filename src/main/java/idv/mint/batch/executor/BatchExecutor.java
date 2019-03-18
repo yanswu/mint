@@ -1,41 +1,38 @@
 package idv.mint.batch.executor;
 
-import idv.mint.batch.BatchSettings;
+import idv.mint.batch.BatchContextUtils;
 import idv.mint.batch.Context;
-import idv.mint.batch.ContextParamUtils;
-import idv.mint.batch.handler.StockBalanceSheetCsvHandler;
-import idv.mint.batch.handler.StockCategoryCsvHandler;
-import idv.mint.batch.handler.StockCategoryPersistHandler;
-import idv.mint.batch.handler.StockCsvHandler;
-import idv.mint.batch.handler.StockDividendCsvHandler;
-import idv.mint.batch.handler.StockEpsCsvHandler;
-import idv.mint.batch.handler.StockIncomeStatementCsvHandler;
-import idv.mint.batch.handler.StockPersistHandler;
-import idv.mint.batch.handler.StockPriceHistoryCsvHandler;
+import idv.mint.batch.handler.csv.StockBalanceSheetCsvHandler;
+import idv.mint.batch.handler.csv.StockCategoryCsvHandler;
+import idv.mint.batch.handler.csv.StockCsvHandler;
+import idv.mint.batch.handler.csv.StockDividendCsvHandler;
+import idv.mint.batch.handler.csv.StockEpsCsvHandler;
+import idv.mint.batch.handler.csv.StockIncomeStatementCsvHandler;
+import idv.mint.batch.handler.csv.StockPriceHistoryCsvHandler;
+import idv.mint.batch.handler.persistence.StockCategoryPersistHandler;
+import idv.mint.batch.handler.persistence.StockPersistHandler;
+import idv.mint.batch.handler.persistence.StockSheetPersistHandler;
 
 public class BatchExecutor {
     
     public static void main(String[] args) throws Exception {
 	
+//	Context<BatchSettings, Object> context = ContextParamUtils.createContext();
 	
+//	updateStockAndCategory(context);
+//	
+//	updateSheet(context);
+//
+//	updateIncomeStatement(context);
+//	
+//	updateBalanceSheet(context);
+//
+//	updateStockPriceHistory(context);
 	
-	Context<BatchSettings, Object> context = ContextParamUtils.createContext();
-	
-	
-	updateStockAndCategory(context);
-	
-	updateSheet(context);
-
-	updateIncomeStatement(context);
-	
-	updateBalanceSheet(context);
-
-	updateStockPriceHistory(context);
-	
-	
+	initDBData();
     }
     
-    private static void updateStockAndCategory(Context<BatchSettings, Object> context) {
+    private static void updateStockAndCategory(Context<Context.Constants, Object> context) {
 	
 	StockCategoryCsvHandler categoryCsvHandler = new StockCategoryCsvHandler();
 	
@@ -47,7 +44,7 @@ public class BatchExecutor {
 
     }
 
-    private static void updateSheet(Context<BatchSettings, Object> context) {
+    private static void updateSheet(Context<Context.Constants, Object> context) {
 	
 	StockEpsCsvHandler epsCsvHandler = new StockEpsCsvHandler();
 	
@@ -59,7 +56,7 @@ public class BatchExecutor {
 	
     }
 
-    private static void updateIncomeStatement(Context<BatchSettings, Object> context) {
+    private static void updateIncomeStatement(Context<Context.Constants, Object> context) {
 	
 	StockIncomeStatementCsvHandler incomeStatementCsvHandler = new StockIncomeStatementCsvHandler();
 	
@@ -67,7 +64,7 @@ public class BatchExecutor {
 	
     }
 
-    private static void updateBalanceSheet(Context<BatchSettings, Object> context) {
+    private static void updateBalanceSheet(Context<Context.Constants, Object> context) {
 	
 	StockBalanceSheetCsvHandler balanceSheetCsvHandler = new StockBalanceSheetCsvHandler();
 	
@@ -75,7 +72,7 @@ public class BatchExecutor {
 	
     }
 
-    private static void updateStockPriceHistory(Context<BatchSettings, Object> context) {
+    private static void updateStockPriceHistory(Context<Context.Constants, Object> context) {
 	
 	StockPriceHistoryCsvHandler stockPriceCsvHandler = new StockPriceHistoryCsvHandler();
 	
@@ -85,17 +82,17 @@ public class BatchExecutor {
 
     private static void initDBData() {
 	
-	Context<BatchSettings, Object> context = ContextParamUtils.createContextWithSpringConfig();
+	Context<Context.Constants, Object> context = BatchContextUtils.createContextWithSpringConfig();
 	
-	StockCategoryPersistHandler stockCatetoryHandler = new StockCategoryPersistHandler();
+	StockCategoryPersistHandler stockCatetoryPersistHandler = new StockCategoryPersistHandler();
+	StockPersistHandler stockPersistHandler = new StockPersistHandler();
+	StockSheetPersistHandler stockSheetPersistHandler = new StockSheetPersistHandler();	
 	
-	StockPersistHandler stockHandler = new StockPersistHandler();
+	stockCatetoryPersistHandler.setNextHandler(stockPersistHandler);
+	stockPersistHandler.setNextHandler(stockSheetPersistHandler);
 	
-	stockCatetoryHandler.setNextHandler(stockHandler);
-	
-	
-	stockCatetoryHandler.executeTask(context);
-	
+//	stockCatetoryPersistHandler.executeTask(context);
+	stockSheetPersistHandler.executeTask(context);
     }
     
     

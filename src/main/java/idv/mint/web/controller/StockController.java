@@ -19,66 +19,66 @@ import idv.mint.service.StockService;
 @RequestMapping(value = "/stock")
 public class StockController {
 
-    private static final Logger logger = LogManager.getLogger(StockController.class);
+	private static final Logger logger = LogManager.getLogger(StockController.class);
 
-    @Autowired
-    StockService stockService;
+	@Autowired
+	StockService stockService;
 
-    @RequestMapping(value = { "/{stockCode}" }, method = RequestMethod.GET)
-    public ResponseEntity<Stock> getStock(@PathVariable String stockCode) {
+	@RequestMapping(value = { "/{stockCode}" }, method = RequestMethod.GET)
+	public ResponseEntity<Stock> getStock(@PathVariable String stockCode) {
 
-	logger.debug("stockCode is[" + stockCode + "]");
+		logger.debug("stockCode is[" + stockCode + "]");
 
-	Stock stock = stockService.getStock(stockCode);
+		Stock stock = stockService.getStock(stockCode);
 
-	if (stock != null) {
-	    return new ResponseEntity<Stock>(stock, HttpStatus.OK);
-	} else {
-	    return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+		if (stock != null) {
+			return new ResponseEntity<Stock>(stock, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+		}
 	}
-    }
 
-    @RequestMapping(value = { "/lastestEps/{stockCode}" }, method = RequestMethod.PUT)
-    public ResponseEntity<Stock> updateLastEep(@PathVariable String stockCode) {
+	@RequestMapping(value = { "/lastestEps/{stockCode}" }, method = RequestMethod.PUT)
+	public ResponseEntity<Stock> updateLastEep(@PathVariable String stockCode) {
 
-	logger.debug("stockCode is[" + stockCode + "]");
+		logger.debug("stockCode is[" + stockCode + "]");
 
-	Stock stock = stockService.getStock(stockCode);
+		Stock stock = stockService.getStock(stockCode);
 
-	if (stock != null) {
+		if (stock != null) {
 
-	    try {
-		stockService.updateLastestEPS(stockCode);
-		stock = stockService.getStock(stockCode);
-	    } catch (IOException e) {
-		logger.error(e, e);
-	    }
-	    return new ResponseEntity<Stock>(stock, HttpStatus.OK);
+			try {
+				stockService.updateLastestEPS(stockCode);
+				stock = stockService.getStock(stockCode);
+			} catch (IOException e) {
+				logger.error(e, e);
+			}
+			return new ResponseEntity<Stock>(stock, HttpStatus.OK);
 
-	} else {
-	    return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+		}
 	}
-    }
 
-    @RequestMapping(value = { "/lastestDividend/{stockCode}" }, method = RequestMethod.PUT)
-    public ResponseEntity<Stock> updateLastestDividend(@PathVariable String stockCode) {
-	
-	logger.debug("stockCode is[" + stockCode + "]");
-	
-	Stock stock = stockService.getStock(stockCode);
-	
-	if (stock != null) {
-	    
-	    try {
-		stockService.updateLastestDividend(stockCode);
-		stock = stockService.getStock(stockCode);
-	    } catch (IOException e) {
-		logger.error(e, e);
-	    }
-	    return new ResponseEntity<Stock>(stock, HttpStatus.OK);
-	    
-	} else {
-	    return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+	@RequestMapping(value = { "/lastestDividend/{stockCode}" }, method = RequestMethod.PUT)
+	public ResponseEntity<Stock> updateLastestDividend(@PathVariable String stockCode) {
+
+		logger.debug("stockCode is[" + stockCode + "]");
+
+		Stock stock = stockService.getStock(stockCode);
+
+		if (stock != null) {
+
+			try {
+				stockService.updateLastestDividend(stockCode);
+				stock = stockService.getStock(stockCode);
+			} catch (IOException e) {
+				logger.error(e, e);
+			}
+			return new ResponseEntity<Stock>(stock, HttpStatus.OK);
+
+		} else {
+			return new ResponseEntity<Stock>(HttpStatus.NOT_FOUND);
+		}
 	}
-    }
 }
