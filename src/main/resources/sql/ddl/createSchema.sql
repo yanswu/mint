@@ -32,3 +32,15 @@ create table T_STOCK_SHEET (
         UPDATE_TIME TIMESTAMP ,
         primary key (STOCK_ID,CAL_YEAR)
     );
+
+    create table T_STOCK_PRICE_HISTORY (
+        STOCK_ID varchar(10) not null,
+        CAL_YEAR date not null,
+        LOW_PRICE numeric(19, 2),
+        HIGH_PRICE numeric(19, 2),
+        CASH_DIVIDEND numeric(19, 2),
+        STOCK_DIVIDEND numeric(19, 2),
+        INSERT_TIME TIMESTAMP ,
+        UPDATE_TIME TIMESTAMP ,
+        primary key (STOCK_ID,CAL_YEAR)
+    );
